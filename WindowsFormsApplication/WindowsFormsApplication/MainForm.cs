@@ -15,8 +15,8 @@ using System.Management;
 using static System.Windows.Forms.ListView;
 using ConjTable.Demo;
 using log4net;
-using System.Reflection;
 using log4net.Config;
+using System.Reflection;
 
 namespace WindowsFormsApplication
 {
@@ -37,7 +37,7 @@ namespace WindowsFormsApplication
             string userAccountControllerException = controller.UserAccountControllerException;
             if (showException(userAccountControllerException))
             {
-                Form error = new Form();
+                Form error = new DialogWithOneButtom(userAccountControllerException);
                 error.Show();
             }
             else
@@ -79,7 +79,7 @@ namespace WindowsFormsApplication
                 FileController controller = new FileController(directoryName);
                 string fileControllerException = controller.FileControllerException;
                 listView1.Items.Clear();
-                if (isNotEmpty(fileControllerException))
+                if (showException(fileControllerException))
                 {
                     MessageBox.Show(fileControllerException);
                 }
@@ -113,22 +113,25 @@ namespace WindowsFormsApplication
 
             if (fileItemsCount > 0 && userItemsCount > 0)
             {
-                Form graphForm = new GraphForm(fileItems, userItems);
-                graphForm.ShowDialog();
+                GraphForm graphForm = new GraphForm(fileItems, userItems);
+                graphForm.Show();
             }
             else
             {
                 if (fileItemsCount == 0 && userItemsCount == 0)
                 {
-                    MessageBox.Show("select file(s) and user(s)");
+                    DialogWithOneButtom error = new DialogWithOneButtom("select file(s) and user(s)");
+                    error.ShowDialog();
                 }
                 else if (userItemsCount == 0)
                 {
-                    MessageBox.Show("select user(s)");
+                    DialogWithOneButtom error = new DialogWithOneButtom("select user(s)");
+                    error.ShowDialog();
                 }
                 else
                 {
-                    MessageBox.Show("select file(s)");
+                    DialogWithOneButtom error = new DialogWithOneButtom("select file(s)");
+                    error.ShowDialog();
                 }
             }
 

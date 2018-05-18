@@ -44,7 +44,7 @@ namespace Controller.controller
         {
             get
             {
-                if (isEmpty(fileControllerException))
+                if (isNotEmpty(fileControllerException))
                 {
                     return fileControllerException;
                 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Entity.entity
 {
-    public class Right
+    public class Permission
     {
         [Flags]
         public enum Mask : uint
@@ -35,18 +35,18 @@ namespace Entity.entity
 
         //double a = 0x80000000;
 
-        public const string READ_RIGHT = "FILE_READ_DATA";
-        public const string WHITE_RIGHT = "FILE_WRITE_DATA";
-        public const string EXECUTE_RIGHT = "FILE_EXECUTE";
-        public const string GENERIC_ALL = "GENERIC_ALL";
+        public const string READ_PERMISSION = "FILE_READ_DATA";
+        public const string WHITE_PERMISSION = "FILE_WRITE_DATA";
+        public const string EXECUTE_PERMISSION = "FILE_EXECUTE";
+        public const string GENERIC_ALL_PERMISSION = "GENERIC_ALL";
 
 
-        public static Dictionary<string, string> VALID_RIGHTS = new Dictionary<string, string>()
+        public static Dictionary<string, string> VALID_PERMISSIONS = new Dictionary<string, string>()
         {
-            {READ_RIGHT, "00000001"},
-            {WHITE_RIGHT, "00000002"},
-            {EXECUTE_RIGHT, "00000020"},
-            {GENERIC_ALL, "10000000"},
+            {READ_PERMISSION, "00000001"},
+            {WHITE_PERMISSION, "00000002"},
+            {EXECUTE_PERMISSION, "00000020"},
+            {GENERIC_ALL_PERMISSION, "10000000"},
             {"WRITE_OWNER", "00080000"}
         };
 

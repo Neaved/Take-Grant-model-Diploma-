@@ -5,7 +5,7 @@ using System.Management;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static Entity.entity.Right;
+using static Entity.entity.Permission;
 using static Entity.entity.FileEntity;
 using static Entity.entity.WithSidEntity;
 using static System.Windows.Forms.ListView;
@@ -35,7 +35,7 @@ namespace Controller.controller
         private Dictionary<string, Dictionary<string, List<string>>> dictionaryRights = new Dictionary<string, Dictionary<string, List<string>>>();
         private int[][] adjacencyMatrix;
         private List<GraphVertexEntity> graphVertexs;
-
+        private List<string> warningMessages = new List<string>();
         private List<ManagementEntity> usersListWithAllowedAceType = new List<ManagementEntity>();
         private List<ManagementEntity> usersListWithDeniedAceType = new List<ManagementEntity>();
 
@@ -65,6 +65,14 @@ namespace Controller.controller
             set
             {
                 graphVertexs = value;
+            }
+        }
+
+        public List<string> WarningMessages
+        {
+            get
+            {
+                return warningMessages;
             }
         }
 
@@ -123,37 +131,13 @@ namespace Controller.controller
             {
                 foreach (string file in filesFullname)
                 {
-                    //log.Debug("====================test access rules");
-                    //FileSecurity acl = File.GetAccessControl(@file);
-                    //AuthorizationRuleCollection rules = acl.GetAccessRules(true, true, typeof(NTAccount));
-                    //foreach (AuthorizationRule rule in rules)
-                    //{
-                    //    log.Debug(rule.IdentityReference.ToString());
-                    //    FileSystemAccessRule accessRule = rule as FileSystemAccessRule;
-                    //    if (accessRule != null)
-                    //        log.Debug(accessRule.FileSystemRights.ToString());
-                    //}
-                    //log.Debug("====================test END access rules");
-
-
-
                     ManagementObject managementObject = new ManagementObject(File_Security_Setting_Path.Replace(REPLACE_MACROS, file));
-
-                    //foreach (ManagementBaseObject b in lfs.GetRelated())
-                    //    log.Debug("Trustees " + b["AccountName"] + " is " + b["SID"]);
-
                     ManagementBaseObject outP = managementObject.InvokeMethod("GetSecurityDescriptor", null, null);
                     if (((uint)(outP.Properties["ReturnValue"].Value)) == 0)
                     {
                         ManagementBaseObject Descriptor = ((ManagementBaseObject)(outP.Properties["Descriptor"].Value));
                         ManagementBaseObject[] DaclObject = ((ManagementBaseObject[])(Descriptor.Properties["Dacl"].Value));
                         DumpACEs(DaclObject, file);
-                        //ManagementBaseObject OwnerObject = ((ManagementBaseObject)(Descriptor.Properties["Owner"].Value));
-                        //DumpOwnerProperties(OwnerObject.Properties); // Show owner properies
-                        //ManagementBaseObject GroupObject = ((ManagementBaseObject)(Descriptor.Properties["Group"].Value));
-                        //DumpGroup(GroupObject);
-                        //ManagementBaseObject[] SaclObject = ((ManagementBaseObject[])(Descriptor.Properties["SACL"].Value));
-                        //DumpSacl(SaclObject);
                     }
 
                 }
@@ -167,53 +151,140 @@ namespace Controller.controller
 
         }
 
-        //Dictionary<string, ManagementEntity> usersWithAllowedAceType = new Dictionary<string, List<string>>();
+        private void DumpACEs(ManagementBaseObject[] daclObject, string fileName)
+        {
+            fillUsersListAcсordingToAceTypeValue(daclObject);
+            List<string> allowedAceUserSidValues = getAllowedAceUserSidValues();
+            List<string> allowedAceUserNames = getAllowedAceUserNames();
+            Dictionary<string, List<string>> userRights = new Dictionary<string, List<string>>();
+            List<string> existedUserSids = new List<string>();
 
+            log.Debug("----------------------------------------------fileName: " + fileName + " ---------------------------------------------------------------------------");
 
+            foreach (UserAccount selectedUser in selectedUsers)
+            {
+                log.Debug("----------------------------------------------st for selectedUser: " + selectedUser.ToString() + " ---------------------------------------------------------------------------");
+
+                string selectedUserSidValue = selectedUser.Sid;
+                UInt32 accessMask = 0;// 1180063;
+                bool isUserHaveNeedRightForGraph = false;
+
+                if (allowedAceUserSidValues.Contains(selectedUserSidValue))
+                {
+                    existedUserSids.Add(selectedUserSidValue);
+                    ManagementEntity allowedAceUser = getManagementEntityBySidValue(selectedUserSidValue);
+                    accessMask = getFinalAccessMask(allowedAceUser.AccessMask, getDeniedAccessMaskBySidValue(selectedUserSidValue));
+                    log.Debug("final AccessMask: " + accessMask);
+                }
+                else
+                {
+                    log.Debug("TODO: logic with groups");
+
+                    List<ManagementEntity> groupsInDacl = getGroupsFromDacl(selectedUser.GroupNames);
+                    log.Debug("groupsInDacl count: " + groupsInDacl.Count);
+
+                    if (isNotEmpty(groupsInDacl))
+                    {
+                        existedUserSids.Add(selectedUserSidValue);
+                        if (groupsInDacl.Count == 1)
+                        {
+                            ManagementEntity allowedAceGroup = groupsInDacl[0];
+                            accessMask = getFinalAccessMask(allowedAceGroup.AccessMask, getDeniedAccessMaskBySidValue(allowedAceGroup.Sid));
+                            log.Debug("final AccessMask: " + accessMask);
+                        }
+                        else
+                        {
+                            ManagementEntity allowedAceGroup = getGroupWithMaxAccessMask(groupsInDacl);
+                            accessMask = getFinalAccessMask(allowedAceGroup.AccessMask, getDeniedAccessMaskBySidValue(allowedAceGroup.Sid));
+                            log.Debug("final AccessMask: " + accessMask);
+                        }
+                    }
+                }
+
+                if (accessMask != 0)
+                {
+                    string[] permissions = Enum.Format(typeof(Mask), accessMask, "g").Replace(" ", string.Empty).Split(',');
+                    List<string> permissionsOnFile = new List<string>();
+                    foreach (string permission in permissions)
+                    {
+                        log.Debug("permission: " + permission);
+                        if (VALID_PERMISSIONS.ContainsKey(permission))
+                        {
+                            string hexRightValue;
+                            VALID_PERMISSIONS.TryGetValue(permission, out hexRightValue);
+                            permissionsOnFile.Add(hexRightValue);
+                            log.Debug("permissionsOnFile add: " + permission);
+                        }
+                    }
+
+                    if (isNotEmpty(permissionsOnFile))
+                    {
+                        if (isAdministratorSidValue(selectedUserSidValue))
+                        {
+                            permissionsOnFile.Add("100000000");
+                            //permissionsOnFile.Add("administratorFlag");
+                        }
+                        userRights.Add(selectedUserSidValue, permissionsOnFile);
+                        isUserHaveNeedRightForGraph = true;
+                    }
+
+                    if (!isUserHaveNeedRightForGraph)
+                    {
+                        log.Debug("user with sid '" + selectedUserSidValue + "' don't have need right on file '" + fileName + "' for graph");
+                        warningMessages.Add("user with sid '" + selectedUserSidValue + "' don't have need right on file '" + fileName + "' for graph");
+                    }
+
+                }
+
+                log.Debug("----------------------------------------------end for selectedUser---------------------------------------------------------------------------");
+
+            }
+
+            fillWarningMessages(existedUserSids, fileName);
+
+            if (isNotEmpty(userRights))
+            {
+                dictionaryRights.Add(fileName, userRights);
+            }
+
+        }
         private void fillUsersListAcсordingToAceTypeValue(ManagementBaseObject[] DaclObject)
         {
             log.Debug("-------------------fillUsersListAcсordingToAceTypeValue st------------------------------");
 
             foreach (ManagementBaseObject mbo in DaclObject)
             {
-                log.Debug("-------------------DaclObject Properties------------------------------");
-                foreach (PropertyData prop in mbo.Properties)
-                {
-                    log.Debug("propName: '" + prop.Name + "' - propValue: '" + prop.Value + "'");
-                }
-                log.Debug("---------------------------------------------------------------------");
-                log.Debug("");
+                //log.Debug("-------------------DaclObject Properties------------------------------");
+                //foreach (PropertyData prop in mbo.Properties)
+                //{
+                //    log.Debug("propName: '" + prop.Name + "' - propValue: '" + prop.Value + "'");
+                //}
+                //log.Debug("---------------------------------------------------------------------");
+                //log.Debug("");
 
                 ManagementBaseObject Trustee = ((ManagementBaseObject)(mbo["Trustee"]));
-                log.Debug("-------------------Trustee Properties------------------------------");
-                foreach (PropertyData prop in Trustee.Properties)
-                {
-                    log.Debug("propName: '" + prop.Name + "' - propValue: '" + prop.Value + "'");
-                }
-                log.Debug("---------------------------------------------------------------------");
-                log.Debug("");
+                ManagementEntity managementEntity = new ManagementEntity(
+                    (string)Trustee.Properties["Name"].Value,
+                    (string)Trustee.Properties["SIDString"].Value,
+                    (UInt32)mbo["AccessMask"]);
+
+                //log.Debug("-------------------Trustee Properties------------------------------");
+                //foreach (PropertyData prop in Trustee.Properties)
+                //{
+                //    log.Debug("propName: '" + prop.Name + "' - propValue: '" + prop.Value + "'");
+                //}
+                //log.Debug("---------------------------------------------------------------------");
+                //log.Debug("");
 
                 if (mbo["AceType"].ToString() == "0")
                 {
                     log.Debug("ALLOWED ACE TYPE");
-                    usersListWithAllowedAceType.Add(
-                        new ManagementEntity(
-                            (string)Trustee.Properties["Name"].Value,
-                            (string)Trustee.Properties["SIDString"].Value,
-                            (UInt32)mbo["AccessMask"]
-                            )
-                        );
+                    usersListWithAllowedAceType.Add(managementEntity);
                 }
                 else
                 {
                     log.Debug("DENIED ACE TYPE");
-                    usersListWithDeniedAceType.Add(
-                        new ManagementEntity(
-                            (string)Trustee.Properties["Name"].Value,
-                            (string)Trustee.Properties["SIDString"].Value,
-                            (UInt32)mbo["AccessMask"]
-                            )
-                         );
+                    usersListWithDeniedAceType.Add(managementEntity);
                 }
 
             }
@@ -250,135 +321,6 @@ namespace Controller.controller
                 }
             }
             return null;
-        }
-
-        private void DumpACEs(ManagementBaseObject[] daclObject, string fileName)
-        {
-
-            fillUsersListAcсordingToAceTypeValue(daclObject);
-            List<string> allowedAceUserSidValues = getAllowedAceUserSidValues();
-            List<string> allowedAceUserNames = getAllowedAceUserNames();
-
-            Dictionary<string, List<string>> userRights = new Dictionary<string, List<string>>();
-            List<string> existedUserSids = new List<string>();
-
-
-            log.Debug("----------------------------------------------fileName: " + fileName + " ---------------------------------------------------------------------------");
-
-            foreach (UserAccount selectedUser in selectedUsers)
-            {
-                log.Debug("----------------------------------------------st for selectedUser: " + selectedUser.ToString() + " ---------------------------------------------------------------------------");
-
-                UInt32 accessMask = 0;// 1180063;
-                string selectedUserSidValue = selectedUser.Sid;
-                if (allowedAceUserSidValues.Contains(selectedUserSidValue))
-                {
-                    ManagementEntity allowedAceUser = getManagementEntityBySidValue(selectedUserSidValue);
-                    accessMask = getFinalAccessMask(allowedAceUser.AccessMask, getDeniedAccessMaskBySidValue(selectedUserSidValue));
-                    log.Debug("final AccessMask: " + accessMask);
-                }
-                else
-                {
-                    log.Debug(" //TODO: logic with groups");
-
-                    List<ManagementEntity> groupsInDacl = getGroupsFromDacl(selectedUser.GroupNames);
-                    log.Debug("groupsInDacl count: " + groupsInDacl.Count);
-
-                    if (isNotEmpty(groupsInDacl))
-                    {
-                        if (groupsInDacl.Count == 1)
-                        {
-                            ManagementEntity allowedAceGroup = groupsInDacl[0];
-                            accessMask = getFinalAccessMask(allowedAceGroup.AccessMask, getDeniedAccessMaskBySidValue(allowedAceGroup.Sid));
-                            log.Debug("final AccessMask: " + accessMask);
-                        }
-                        else
-                        {
-                            ManagementEntity allowedAceGroup = getGroupWithMaxAccessMask(groupsInDacl);
-                            accessMask = getFinalAccessMask(allowedAceGroup.AccessMask, getDeniedAccessMaskBySidValue(allowedAceGroup.Sid));
-                            log.Debug("final AccessMask: " + accessMask);
-                        }
-                    }
-                }
-
-                if (accessMask != 0)
-                {
-                    string[] fileRights = Enum.Format(typeof(Mask), accessMask, "g").Replace(" ", string.Empty).Split(',');
-                    List<string> fileRightsToDictionary = new List<string>();
-                    foreach (string fileRight in fileRights)
-                    {
-                        log.Debug("fileRight: " + fileRight);
-                        if (VALID_RIGHTS.ContainsKey(fileRight))
-                        {
-                            string hexRightValue;
-                            VALID_RIGHTS.TryGetValue(fileRight, out hexRightValue);
-                            fileRightsToDictionary.Add(hexRightValue);
-                            log.Debug("fileRightsToDictionary add: " + fileRight);
-                        }
-                    }
-
-                    if (isNotEmpty(fileRightsToDictionary))
-                    {
-                        if (isAdministratorSidValue(selectedUserSidValue))
-                        {
-                            fileRightsToDictionary.Add("100000000");
-                            //fileRightsToDictionary.Add("administratorFlag");
-                        }
-                        userRights.Add(selectedUserSidValue, fileRightsToDictionary);
-                        //isUserHaveNeedRightForGraph = true;
-                    }
-
-                }
-
-                log.Debug("----------------------------------------------end for selectedUser---------------------------------------------------------------------------");
-
-            }
-
-            if (isNotEmpty(userRights))
-            {
-                dictionaryRights.Add(fileName, userRights);
-            }
-
-        }
-
-        private ManagementEntity getGroupWithMaxAccessMask(List<ManagementEntity> groupsInDacl)
-        {
-            UInt32 accessMask = 0;
-            ManagementEntity groupWithMaxAccessMask = null;
-            foreach (ManagementEntity group in groupsInDacl)
-            {
-                UInt32 groupAccessMask = group.AccessMask;
-                if (groupAccessMask > accessMask)
-                {
-                    accessMask = groupAccessMask;
-                    groupWithMaxAccessMask = group;
-                }
-                log.Debug("getGroupWithMaxAccessMask accessMask: " + accessMask);
-            }
-            return groupWithMaxAccessMask;
-        }
-
-        private List<ManagementEntity> getGroupsFromDacl(HashSet<string> groupNames)
-        {
-            List<ManagementEntity> groupsInDacl = new List<ManagementEntity>();
-            foreach (string groupName in groupNames)
-            {
-                //log.Debug("groupName: " + groupName);
-                //log.Debug("groupName Length: " + groupName.Length);
-                foreach (ManagementEntity allowedAceUser in usersListWithAllowedAceType)
-                {
-                    //log.Debug("allowedAceUser.Name: " + allowedAceUser.Name);
-                    //log.Debug("allowedAceUser.Name Length: " + allowedAceUser.Name.Length);
-                    //log.Debug("allowedAceUser.Sid: " + allowedAceUser.Sid);
-                    //log.Debug("allowedAceUser.Sid.Length: " + allowedAceUser.Sid.Split('-').Length);
-
-                    if ((groupName.Equals(allowedAceUser.Name)) && (allowedAceUser.Sid.Split('-').Length < 8))
-                    {
-                        groupsInDacl.Add(allowedAceUser);
-                    }
-                }
-            }
-            return groupsInDacl;
         }
 
         private UInt32 getDeniedAccessMaskBySidValue(string userSid)
@@ -438,11 +380,81 @@ namespace Controller.controller
             return binaryAccessMask;
         }
 
+        private ManagementEntity getGroupWithMaxAccessMask(List<ManagementEntity> groupsInDacl)
+        {
+            UInt32 accessMask = 0;
+            ManagementEntity groupWithMaxAccessMask = null;
+            foreach (ManagementEntity group in groupsInDacl)
+            {
+                UInt32 groupAccessMask = group.AccessMask;
+                if (groupAccessMask > accessMask)
+                {
+                    accessMask = groupAccessMask;
+                    groupWithMaxAccessMask = group;
+                }
+                log.Debug("getGroupWithMaxAccessMask accessMask: " + accessMask);
+            }
+            return groupWithMaxAccessMask;
+        }
+
+        private List<ManagementEntity> getGroupsFromDacl(HashSet<string> groupNames)
+        {
+            List<ManagementEntity> groupsInDacl = new List<ManagementEntity>();
+            foreach (string groupName in groupNames)
+            {
+                //log.Debug("groupName: " + groupName);
+                //log.Debug("groupName Length: " + groupName.Length);
+                foreach (ManagementEntity allowedAceUser in usersListWithAllowedAceType)
+                {
+                    //log.Debug("allowedAceUser.Name: " + allowedAceUser.Name);
+                    //log.Debug("allowedAceUser.Name Length: " + allowedAceUser.Name.Length);
+                    //log.Debug("allowedAceUser.Sid: " + allowedAceUser.Sid);
+                    //log.Debug("allowedAceUser.Sid.Length: " + allowedAceUser.Sid.Split('-').Length);
+
+                    if ((groupName.Equals(allowedAceUser.Name)) && (allowedAceUser.Sid.Split('-').Length < 8))
+                    {
+                        groupsInDacl.Add(allowedAceUser);
+                    }
+                }
+            }
+            return groupsInDacl;
+        }
+
         private bool isAdministratorSidValue(string sidValue)
         {
             string[] sidParts = sidValue.Trim().Split('-');
             return ADMINISTRATOR_SID_VALUES.Contains(sidParts[sidParts.Length - 1]);
             //return "500".Equals(sidParts[sidParts.Length - 1]);
+        }
+
+        private void fillWarningMessages(List<string> existedUserSids, string fileName)
+        {
+            if (isEmpty(existedUserSids))
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (UserAccount selectedUser in selectedUsers)
+                {
+                    sb.Append(selectedUser.Sid).Append(", ");
+                }
+                string userSidsStr = sb.ToString();
+                log.Debug("there is no such user(s) " + userSidsStr.Substring(0, userSidsStr.Length - 2) + " in security property of " + fileName);
+                warningMessages.Add("there is no such user(s) " + userSidsStr.Substring(0, userSidsStr.Length - 2) + " in security property of " + fileName);
+            }
+            else if (!existedUserSids.Count.Equals(selectedUsers.Count))
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (UserAccount selectedUser in selectedUsers)
+                {
+                    string selectedUserSidValue = selectedUser.Sid;
+                    if (!existedUserSids.Contains(selectedUserSidValue))
+                    {
+                        sb.Append(selectedUserSidValue).Append(", ");
+                    }
+                }
+                string notExistedUserSidsStr = sb.ToString();
+                log.Debug("there is no such user(s) " + notExistedUserSidsStr.Substring(0, notExistedUserSidsStr.Length - 2) + " in security property of " + fileName);
+                warningMessages.Add("there is no such user(s) " + notExistedUserSidsStr.Substring(0, notExistedUserSidsStr.Length - 2) + " in security property of " + fileName);
+            }
         }
 
         private void buildAccessMatrix()
@@ -506,13 +518,18 @@ namespace Controller.controller
                             )
                         );
                 }
-                graphVertexs.Add(
-                    new GraphVertexEntity(
-                        getLastValueFromSid(lineElements[i]),
-                        false
-                        )
-                    );
+                else
+                {
+                    graphVertexs.Add(
+                        new GraphVertexEntity(
+                            getLastValueFromSid(lineElements[i]),
+                            false
+                            )
+                        );
+                }
             }
+            foreach (GraphVertexEntity g in graphVertexs)
+                log.Debug("graphVertexs: " + g.ToString());
             return graphVertexs;
         }
 

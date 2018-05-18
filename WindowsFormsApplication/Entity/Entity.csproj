@@ -51,7 +51,7 @@
     <Compile Include="entity\BaseEntity.cs" />
     <Compile Include="entity\ManagementEntity.cs" />
     <Compile Include="entity\MatrixElement.cs" />
-    <Compile Include="entity\Right.cs" />
+    <Compile Include="entity\Permission.cs" />
     <Compile Include="entity\UserAccount.cs" />
     <Compile Include="entity\WithSidEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

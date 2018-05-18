@@ -50,11 +50,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AccessMatrix.cs">
+    <Compile Include="GraphForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AccessMatrix.Designer.cs">
-      <DependentUpon>AccessMatrix.cs</DependentUpon>
+    <Compile Include="GraphForm.Designer.cs">
+      <DependentUpon>GraphForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DialogWithOneButtom.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DialogWithOneButtom.Designer.cs">
+      <DependentUpon>DialogWithOneButtom.cs</DependentUpon>
     </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -70,8 +76,11 @@
     <Compile Include="UserAccounts.Designer.cs">
       <DependentUpon>UserAccounts.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="AccessMatrix.resx">
-      <DependentUpon>AccessMatrix.cs</DependentUpon>
+    <EmbeddedResource Include="GraphForm.resx">
+      <DependentUpon>GraphForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DialogWithOneButtom.resx">
+      <DependentUpon>DialogWithOneButtom.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>

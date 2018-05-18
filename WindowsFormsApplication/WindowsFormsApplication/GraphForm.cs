@@ -4,29 +4,37 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using Entity.entity;
 using static System.Windows.Forms.ListView;
-
+using static Controller.controller.ControllerUtils;
+using log4net;
+using log4net.Config;
+using System.Reflection;
 
 namespace ConjTable.Demo
 {
     public partial class GraphForm : Form
     {
+        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private int[][] _matrix;
         private List<GraphVertexEntity> graphVertexs;
         private List<MatrixElement> ownerElements = new List<MatrixElement>();
         private List<MatrixElement> adminElements = new List<MatrixElement>();
+        //private List<string> warningMessages = new List<string>();
 
         public GraphForm()
         {
+            XmlConfigurator.Configure();
             InitializeComponent();
         }
 
         public GraphForm(SelectedListViewItemCollection fileItems, SelectedListViewItemCollection entityItems)
         {
+            XmlConfigurator.Configure();
             InitializeComponent();
             AccessMatrixController controller = new AccessMatrixController(fileItems, entityItems);
             this._matrix = getAccessMatrix(controller.AdjacencyMatrix);
             this.graphVertexs = controller.GraphVertexs;
+            addWarningMessages(controller.WarningMessages);
         }
 
         private int[][] getAccessMatrix(int[][] adjacencyMatrix)
@@ -66,6 +74,21 @@ namespace ConjTable.Demo
         //    {1, 1, 1, 0, 1},
         //};
 
+        private void addWarningMessages(List<string> warningMessages)
+        {
+            listBox1.Items.Clear();
+            log.Debug("warningMessages Count: " + warningMessages.Count);
+            if (isNotEmpty(warningMessages))
+            {
+                foreach (string warningMessage in warningMessages)
+                {
+                    log.Debug("warningMessage: " + warningMessage);
+                    listBox1.Items.Add(warningMessage);
+                }
+            }
+
+        }
+
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
@@ -81,6 +104,11 @@ namespace ConjTable.Demo
         private void conjTable1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
             conjPanel1.Build(conjTable1.Matrix, graphVertexs, ownerElements, adminElements);
+        }
+
+        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
