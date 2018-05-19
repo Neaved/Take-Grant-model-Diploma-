@@ -20,13 +20,6 @@ namespace ConjTable.Demo
         private List<GraphVertexEntity> graphVertexs;
         private List<MatrixElement> ownerElements = new List<MatrixElement>();
         private List<MatrixElement> adminElements = new List<MatrixElement>();
-        //private List<string> warningMessages = new List<string>();
-
-        public GraphForm()
-        {
-            XmlConfigurator.Configure();
-            InitializeComponent();
-        }
 
         public GraphForm(SelectedListViewItemCollection fileItems, SelectedListViewItemCollection entityItems)
         {
@@ -105,11 +98,6 @@ namespace ConjTable.Demo
         private void conjTable1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
             conjPanel1.Build(conjTable1.Matrix, graphVertexs, ownerElements, adminElements);
-        }
-
-        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
         }
 
         private void toolStripButton1_Click(object sender, EventArgs e)

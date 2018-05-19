@@ -35,14 +35,10 @@ namespace WindowsFormsApplication
         {
             UserAccountController controller = UserAccountController.Instance;
             string userAccountControllerException = controller.UserAccountControllerException;
-            if (true /*showException(userAccountControllerException)*/)
+            if (showException(userAccountControllerException))
             {
-                //Form error = new DialogWithOneButtom(userAccountControllerException);
-                //error.Show();
-                UserAccounts test = new UserAccounts();
-                test.ShowDialog();
-                refreshListView(controller.UserAccounts);
-
+                DialogWithOneButtom error = new DialogWithOneButtom(userAccountControllerException);
+                error.Show();
             }
             else
             {
@@ -85,7 +81,8 @@ namespace WindowsFormsApplication
                 listView1.Items.Clear();
                 if (showException(fileControllerException))
                 {
-                    MessageBox.Show(fileControllerException);
+                    DialogWithOneButtom error = new DialogWithOneButtom(fileControllerException);
+                    error.Show();
                 }
                 else
                 {
@@ -97,7 +94,8 @@ namespace WindowsFormsApplication
             }
             else
             {
-                MessageBox.Show("fill directory path");
+                DialogWithOneButtom error = new DialogWithOneButtom("fill directory path");
+                error.Show();
             }
         }
 
