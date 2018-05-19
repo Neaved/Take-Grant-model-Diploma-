@@ -8,6 +8,7 @@ using static Controller.controller.ControllerUtils;
 using log4net;
 using log4net.Config;
 using System.Reflection;
+using WindowsFormsApplication;
 
 namespace ConjTable.Demo
 {
@@ -109,6 +110,12 @@ namespace ConjTable.Demo
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            AdditionalGraphInfoForm additionalGraphInfoForm = new AdditionalGraphInfoForm();
+            additionalGraphInfoForm.ShowDialog();
         }
     }
 }

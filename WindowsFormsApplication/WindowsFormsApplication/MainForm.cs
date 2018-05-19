@@ -35,10 +35,14 @@ namespace WindowsFormsApplication
         {
             UserAccountController controller = UserAccountController.Instance;
             string userAccountControllerException = controller.UserAccountControllerException;
-            if (showException(userAccountControllerException))
+            if (true /*showException(userAccountControllerException)*/)
             {
-                Form error = new DialogWithOneButtom(userAccountControllerException);
-                error.Show();
+                //Form error = new DialogWithOneButtom(userAccountControllerException);
+                //error.Show();
+                UserAccounts test = new UserAccounts();
+                test.ShowDialog();
+                refreshListView(controller.UserAccounts);
+
             }
             else
             {

@@ -50,6 +50,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdditionalGraphInfoForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AdditionalGraphInfoForm.Designer.cs">
+      <DependentUpon>AdditionalGraphInfoForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="GraphForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -76,6 +82,9 @@
     <Compile Include="UserAccounts.Designer.cs">
       <DependentUpon>UserAccounts.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="AdditionalGraphInfoForm.resx">
+      <DependentUpon>AdditionalGraphInfoForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GraphForm.resx">
       <DependentUpon>GraphForm.cs</DependentUpon>
     </EmbeddedResource>

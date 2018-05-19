@@ -61,8 +61,8 @@ namespace System.Windows.Forms
 
         private void CreateNodes(int[][] conjMatrix)
         {
-            _nodes = Enumerable.Range(0, conjMatrix.Length).Select(i => new Node { Label = graphVertexs[i].Name, IsObject = graphVertexs[i].IsObject }).ToList();
             int conjMatrixLenght = conjMatrix.Length;
+            _nodes = Enumerable.Range(0, conjMatrixLenght).Select(i => new Node { Label = graphVertexs[i].Name, IsObject = graphVertexs[i].IsObject }).ToList();
             for (int i = 0; i < conjMatrixLenght; i++)
                 for (int j = 0; j < conjMatrixLenght; j++)
                 {

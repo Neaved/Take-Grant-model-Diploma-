@@ -32,12 +32,16 @@ namespace WindowsFormsApplication
 
         public UserAccounts(SelectedListViewItemCollection fileItems, SelectedListViewItemCollection entityItems)
         {
-            InitializeComponent();
             AccessMatrixController controller = new AccessMatrixController(fileItems, entityItems);
             listBox1.DataSource = null;
             //listBox1.DataSource = controller.TestLog;
         }
 
+        public UserAccounts()
+        {
+            InitializeComponent();
+
+        }
 
         private void refreshListView(UserAccountController controller)
         {
@@ -49,6 +53,11 @@ namespace WindowsFormsApplication
                 lvi.SubItems.Add(userAccount.Description);
                 listView1.Items.Add(lvi);
             }
+        }
+
+        private void toolStripButton1_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("test");
         }
     }
 }

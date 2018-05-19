@@ -12,7 +12,7 @@ namespace System.Windows.Forms
         private bool isObject;
         private bool isOwner;
         private bool isAdministrator;
-        public float Radius = 30f;
+        public float Radius = 50f;
         public PointF Location;
 
         public void Drag(PointF offset)
