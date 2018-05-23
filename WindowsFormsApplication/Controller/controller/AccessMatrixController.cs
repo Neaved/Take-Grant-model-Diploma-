@@ -1,22 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Management;
+using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using static Entity.entity.Permission;
-using static Entity.entity.FileEntity;
-using static Entity.entity.WithSidEntity;
-using static System.Windows.Forms.ListView;
-using static Controller.controller.ControllerUtils;
-using System.Security.AccessControl;
-using System.IO;
-using System.Security.Principal;
 using Entity.entity;
 using log4net;
-using System.Reflection;
 using log4net.Config;
+using static System.Windows.Forms.ListView;
+using static Controller.controller.ControllerUtils;
+using static Entity.entity.FileEntity;
+using static Entity.entity.Permission;
+using static Entity.entity.WithSidEntity;
 
 namespace Controller.controller
 {
@@ -25,19 +20,26 @@ namespace Controller.controller
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private const string REPLACE_MACROS = "replace_macros";
-        private const string File_Security_Setting_Path = "Win32_LogicalFileSecuritySetting.Path='" + REPLACE_MACROS + "'";
+        private const string File_Security_Setting_Path =
+            "Win32_LogicalFileSecuritySetting.Path='" + REPLACE_MACROS + "'";
 
-        private HashSet<string> ADMINISTRATOR_SID_VALUES = new HashSet<string>() { "500", "544" };
-
+        private HashSet<string> ADMINISTRATOR_SID_VALUES = new HashSet<string>()
+        {
+            "500",
+            "544"
+        };
 
         private List<string> filesFullname;
         private List<UserAccount> selectedUsers;
-        private Dictionary<string, Dictionary<string, List<string>>> dictionaryRights = new Dictionary<string, Dictionary<string, List<string>>>();
+        private Dictionary<string, Dictionary<string, List<string>>> dictionaryRights =
+            new Dictionary<string, Dictionary<string, List<string>>>();
         private int[][] adjacencyMatrix;
         private List<GraphVertexEntity> graphVertexs;
         private List<string> warningMessages = new List<string>();
-        private List<ManagementEntity> usersListWithAllowedAceType = new List<ManagementEntity>();
-        private List<ManagementEntity> usersListWithDeniedAceType = new List<ManagementEntity>();
+        private List<ManagementEntity> usersListWithAllowedAceType =
+            new List<ManagementEntity>();
+        private List<ManagementEntity> usersListWithDeniedAceType =
+            new List<ManagementEntity>();
 
         public Dictionary<string, Dictionary<string, List<string>>> DictionaryRights
         {
@@ -76,20 +78,27 @@ namespace Controller.controller
             }
         }
 
-        public AccessMatrixController(SelectedListViewItemCollection fileItems, SelectedListViewItemCollection userAccountItems)
+        public AccessMatrixController(SelectedListViewItemCollection fileItems,
+            SelectedListViewItemCollection userAccountItems)
         {
             XmlConfigurator.Configure();
-            this.filesFullname = getFileNamesFromItemCollection(fileItems);
-            this.selectedUsers = getSelectedUsers(userAccountItems);
-            //this.userAccountItems = userAccountItems;
-            //this.selectedUserSidValues = getNamesFromItemCollection(userAccountItems, false);
-            // this.userAccountGroups = getGroupsFromItemCollection(userAccountItems);
-            //log.DebugRange(selectedUserSidValues);
-            prepareDictionaryRights();
-            buildAccessMatrix();
+            try
+            {
+                this.filesFullname = getFileNamesFromItemCollection(fileItems);
+                this.selectedUsers = getSelectedUsers(userAccountItems);
+                prepareDictionaryRights();
+                buildAccessMatrix();
+            }
+            catch (Exception ex)
+            {
+                log.Error("Exception Message: " + ex.Message);
+                log.Error("Exception StackTrace: " + ex.StackTrace);
+            }
+
         }
 
-        private List<string> getFileNamesFromItemCollection(SelectedListViewItemCollection items)
+        private List<string> getFileNamesFromItemCollection(
+            SelectedListViewItemCollection items)
         {
             List<string> fileNames = new List<string>(items.Count);
             foreach (ListViewItem item in items)
@@ -127,27 +136,32 @@ namespace Controller.controller
 
         private void prepareDictionaryRights()
         {
-            try
-            {
+            //try
+            //{
                 foreach (string file in filesFullname)
                 {
-                    ManagementObject managementObject = new ManagementObject(File_Security_Setting_Path.Replace(REPLACE_MACROS, file));
-                    ManagementBaseObject outP = managementObject.InvokeMethod("GetSecurityDescriptor", null, null);
+                    ManagementObject managementObject =
+                        new ManagementObject(
+                            File_Security_Setting_Path.Replace(REPLACE_MACROS, file));
+                    ManagementBaseObject outP =
+                        managementObject.InvokeMethod("GetSecurityDescriptor", null, null);
                     if (((uint)(outP.Properties["ReturnValue"].Value)) == 0)
                     {
-                        ManagementBaseObject Descriptor = ((ManagementBaseObject)(outP.Properties["Descriptor"].Value));
-                        ManagementBaseObject[] DaclObject = ((ManagementBaseObject[])(Descriptor.Properties["Dacl"].Value));
+                        ManagementBaseObject Descriptor =
+                            ((ManagementBaseObject)(outP.Properties["Descriptor"].Value));
+                        ManagementBaseObject[] DaclObject =
+                            ((ManagementBaseObject[])(Descriptor.Properties["Dacl"].Value));
                         DumpACEs(DaclObject, file);
                     }
 
                 }
 
-            }
-            catch (Exception ex)
-            {
-                log.Debug(ex.Message);
-                log.Debug(ex.StackTrace);
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    log.Debug(ex.Message);
+            //    log.Debug(ex.StackTrace);
+            //}
 
         }
 
@@ -156,7 +170,8 @@ namespace Controller.controller
             fillUsersListAcсordingToAceTypeValue(daclObject);
             List<string> allowedAceUserSidValues = getAllowedAceUserSidValues();
             List<string> allowedAceUserNames = getAllowedAceUserNames();
-            Dictionary<string, List<string>> userRights = new Dictionary<string, List<string>>();
+            Dictionary<string, List<string>> userRights =
+                new Dictionary<string, List<string>>();
             List<string> existedUserSids = new List<string>();
 
             log.Debug("----------------------------------------------fileName: " + fileName + " ---------------------------------------------------------------------------");
@@ -172,15 +187,19 @@ namespace Controller.controller
                 if (allowedAceUserSidValues.Contains(selectedUserSidValue))
                 {
                     existedUserSids.Add(selectedUserSidValue);
-                    ManagementEntity allowedAceUser = getManagementEntityBySidValue(selectedUserSidValue);
-                    accessMask = getFinalAccessMask(allowedAceUser.AccessMask, getDeniedAccessMaskBySidValue(selectedUserSidValue));
+                    ManagementEntity allowedAceUser =
+                        getManagementEntityBySidValue(selectedUserSidValue);
+                    accessMask = getFinalAccessMask(
+                        allowedAceUser.AccessMask,
+                        getDeniedAccessMaskBySidValue(selectedUserSidValue));
                     log.Debug("final AccessMask: " + accessMask);
                 }
                 else
                 {
                     log.Debug("TODO: logic with groups");
 
-                    List<ManagementEntity> groupsInDacl = getGroupsFromDacl(selectedUser.GroupNames);
+                    List<ManagementEntity> groupsInDacl =
+                        getGroupsFromDacl(selectedUser.GroupNames);
                     log.Debug("groupsInDacl count: " + groupsInDacl.Count);
 
                     if (isNotEmpty(groupsInDacl))
@@ -189,13 +208,18 @@ namespace Controller.controller
                         if (groupsInDacl.Count == 1)
                         {
                             ManagementEntity allowedAceGroup = groupsInDacl[0];
-                            accessMask = getFinalAccessMask(allowedAceGroup.AccessMask, getDeniedAccessMaskBySidValue(allowedAceGroup.Sid));
+                            accessMask = getFinalAccessMask(
+                                allowedAceGroup.AccessMask,
+                                getDeniedAccessMaskBySidValue(allowedAceGroup.Sid));
                             log.Debug("final AccessMask: " + accessMask);
                         }
                         else
                         {
-                            ManagementEntity allowedAceGroup = getGroupWithMaxAccessMask(groupsInDacl);
-                            accessMask = getFinalAccessMask(allowedAceGroup.AccessMask, getDeniedAccessMaskBySidValue(allowedAceGroup.Sid));
+                            ManagementEntity allowedAceGroup =
+                                getGroupWithMaxAccessMask(groupsInDacl);
+                            accessMask = getFinalAccessMask(
+                                allowedAceGroup.AccessMask,
+                                getDeniedAccessMaskBySidValue(allowedAceGroup.Sid));
                             log.Debug("final AccessMask: " + accessMask);
                         }
                     }
@@ -203,7 +227,10 @@ namespace Controller.controller
 
                 if (accessMask != 0)
                 {
-                    string[] permissions = Enum.Format(typeof(Mask), accessMask, "g").Replace(" ", string.Empty).Split(',');
+                    string[] permissions = Enum
+                        .Format(typeof(Mask), accessMask, "g")
+                        .Replace(" ", string.Empty)
+                        .Split(',');
                     List<string> permissionsOnFile = new List<string>();
                     foreach (string permission in permissions)
                     {
@@ -230,8 +257,10 @@ namespace Controller.controller
 
                     if (!isUserHaveNeedRightForGraph)
                     {
-                        log.Debug("user with sid '" + selectedUserSidValue + "' don't have need right on file '" + fileName + "' for graph");
-                        warningMessages.Add("user with sid '" + selectedUserSidValue + "' don't have need right on file '" + fileName + "' for graph");
+                        log.Debug("user with sid '" + getLastValueFromSid(selectedUserSidValue) + "' don't have need right on file '" + fileName + "' for graph");
+                        warningMessages.Add(
+                            "user with sid '" + getLastValueFromSid(selectedUserSidValue) +
+                            "' don't have need right on file '" + fileName + "' for graph");
                     }
 
                 }
@@ -248,10 +277,13 @@ namespace Controller.controller
             }
 
         }
-        private void fillUsersListAcсordingToAceTypeValue(ManagementBaseObject[] DaclObject)
+        private void fillUsersListAcсordingToAceTypeValue(
+            ManagementBaseObject[] DaclObject)
         {
             log.Debug("-------------------fillUsersListAcсordingToAceTypeValue st------------------------------");
 
+            usersListWithAllowedAceType.Clear();
+            usersListWithDeniedAceType.Clear();
             foreach (ManagementBaseObject mbo in DaclObject)
             {
                 //log.Debug("-------------------DaclObject Properties------------------------------");
@@ -293,7 +325,8 @@ namespace Controller.controller
 
         private List<string> getAllowedAceUserSidValues()
         {
-            List<string> allowedAceUserSidValues = new List<string>(usersListWithAllowedAceType.Count);
+            List<string> allowedAceUserSidValues =
+                new List<string>(usersListWithAllowedAceType.Count);
             foreach (ManagementEntity allowedAceUser in usersListWithAllowedAceType)
             {
                 allowedAceUserSidValues.Add(allowedAceUser.Sid);
@@ -303,7 +336,8 @@ namespace Controller.controller
 
         private List<string> getAllowedAceUserNames()
         {
-            List<string> allowedAceUserNames = new List<string>(usersListWithAllowedAceType.Count);
+            List<string> allowedAceUserNames =
+                new List<string>(usersListWithAllowedAceType.Count);
             foreach (ManagementEntity allowedAceUser in usersListWithAllowedAceType)
             {
                 allowedAceUserNames.Add(allowedAceUser.Name);
@@ -336,7 +370,8 @@ namespace Controller.controller
             return 0;
         }
 
-        private UInt32 getFinalAccessMask(UInt32 allowedAccessMask, UInt32 deniedAccessMask)
+        private UInt32 getFinalAccessMask(
+            UInt32 allowedAccessMask, UInt32 deniedAccessMask)
         {
             log.Debug("allowedAccessMask: " + allowedAccessMask);
             log.Debug("deniedAccessMask: " + deniedAccessMask);
@@ -346,8 +381,10 @@ namespace Controller.controller
             }
             else
             {
-                string allowedAccessMaskBin = getFullBinaryAccessMask(Convert.ToString(allowedAccessMask, 2));
-                string deniedAccessMaskBin = getFullBinaryAccessMask(Convert.ToString(deniedAccessMask, 2));
+                string allowedAccessMaskBin =
+                    getFullBinaryAccessMask(Convert.ToString(allowedAccessMask, 2));
+                string deniedAccessMaskBin =
+                    getFullBinaryAccessMask(Convert.ToString(deniedAccessMask, 2));
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < deniedAccessMaskBin.Length; i++)
                 {
@@ -380,7 +417,8 @@ namespace Controller.controller
             return binaryAccessMask;
         }
 
-        private ManagementEntity getGroupWithMaxAccessMask(List<ManagementEntity> groupsInDacl)
+        private ManagementEntity getGroupWithMaxAccessMask(
+            List<ManagementEntity> groupsInDacl)
         {
             UInt32 accessMask = 0;
             ManagementEntity groupWithMaxAccessMask = null;
@@ -411,7 +449,8 @@ namespace Controller.controller
                     //log.Debug("allowedAceUser.Sid: " + allowedAceUser.Sid);
                     //log.Debug("allowedAceUser.Sid.Length: " + allowedAceUser.Sid.Split('-').Length);
 
-                    if ((groupName.Equals(allowedAceUser.Name)) && (allowedAceUser.Sid.Split('-').Length < 8))
+                    if ((groupName.Equals(allowedAceUser.Name))
+                            && (allowedAceUser.Sid.Split('-').Length < 8))
                     {
                         groupsInDacl.Add(allowedAceUser);
                     }
@@ -434,26 +473,31 @@ namespace Controller.controller
                 StringBuilder sb = new StringBuilder();
                 foreach (UserAccount selectedUser in selectedUsers)
                 {
-                    sb.Append(selectedUser.Sid).Append(", ");
+                    sb.Append(selectedUser.LastSidPart).Append(", ");
                 }
                 string userSidsStr = sb.ToString();
                 log.Debug("there is no such user(s) " + userSidsStr.Substring(0, userSidsStr.Length - 2) + " in security property of " + fileName);
-                warningMessages.Add("there is no such user(s) " + userSidsStr.Substring(0, userSidsStr.Length - 2) + " in security property of " + fileName);
+                warningMessages.Add(
+                    "there is no such user(s) " + userSidsStr.Substring(
+                        0, userSidsStr.Length - 2) +
+                    " in security property of " + fileName);
             }
             else if (!existedUserSids.Count.Equals(selectedUsers.Count))
             {
                 StringBuilder sb = new StringBuilder();
                 foreach (UserAccount selectedUser in selectedUsers)
                 {
-                    string selectedUserSidValue = selectedUser.Sid;
-                    if (!existedUserSids.Contains(selectedUserSidValue))
+                    if (!existedUserSids.Contains(selectedUser.Sid))
                     {
-                        sb.Append(selectedUserSidValue).Append(", ");
+                        sb.Append(selectedUser.LastSidPart).Append(", ");
                     }
                 }
                 string notExistedUserSidsStr = sb.ToString();
                 log.Debug("there is no such user(s) " + notExistedUserSidsStr.Substring(0, notExistedUserSidsStr.Length - 2) + " in security property of " + fileName);
-                warningMessages.Add("there is no such user(s) " + notExistedUserSidsStr.Substring(0, notExistedUserSidsStr.Length - 2) + " in security property of " + fileName);
+                warningMessages.Add(
+                    "there is no such user(s) " + notExistedUserSidsStr.Substring(
+                        0, notExistedUserSidsStr.Length - 2) +
+                    " in security property of " + fileName);
             }
         }
 
@@ -462,20 +506,7 @@ namespace Controller.controller
             int subjectCount = selectedUsers.Count;
             int objectCount = dictionaryRights.Count;
 
-            List<string> lineElements = new List<string>(subjectCount + objectCount);
-            foreach (UserAccount selectedUser in selectedUsers)
-            {
-                lineElements.Add(selectedUser.Sid);
-            }
-
-            foreach (KeyValuePair<string, Dictionary<string, List<string>>> item in dictionaryRights)
-            {
-
-                //            lineElements.Add(getFileNameFromPath(item.Key));
-                lineElements.Add(item.Key);
-
-            }
-
+            List<string> lineElements = getSortedlineElements(subjectCount, objectCount);
 
             int[][] adjacencyMatrixTemplate = new int[subjectCount + objectCount][];
             for (int i = 0; i < adjacencyMatrixTemplate.Length; i++)
@@ -485,7 +516,8 @@ namespace Controller.controller
 
             for (int j = subjectCount; j < adjacencyMatrixTemplate.Length; j++)
             {
-                Dictionary<string, List<string>> accountWithTreirRights = new Dictionary<string, List<string>>();
+                Dictionary<string, List<string>> accountWithTreirRights =
+                    new Dictionary<string, List<string>>();
                 dictionaryRights.TryGetValue(lineElements[j], out accountWithTreirRights);
                 for (int i = 0; i < subjectCount; i++)
                 {
@@ -503,10 +535,38 @@ namespace Controller.controller
             writeAdjacencyMatrix.writeAdjacencyMatrix(adjacencyMatrix, lineElements);
         }
 
-        private List<GraphVertexEntity> getGraphVertexs(List<string> lineElements, int subjectCount)
+        private List<string> getSortedlineElements(int subjectCount, int objectCount)
+        {                                           
+            List<string> lineElements = new List<string>(subjectCount + objectCount);
+
+            List<string> sortedSelectedUserSid = new List<string>(subjectCount);
+            foreach (UserAccount selectedUser in selectedUsers)
+            {
+                sortedSelectedUserSid.Add(selectedUser.Sid);
+            }
+            sortedSelectedUserSid.Sort();
+
+            List<string> sortedSelectedFileName = new List<string>(objectCount);
+            foreach (KeyValuePair<string, Dictionary<string, List<string>>> item
+                in dictionaryRights)
+            {
+
+                sortedSelectedFileName.Add(item.Key);
+            }
+            sortedSelectedFileName.Sort();
+
+            lineElements.AddRange(sortedSelectedUserSid);
+            lineElements.AddRange(sortedSelectedFileName);
+
+            return lineElements;
+        }
+
+        private List<GraphVertexEntity> getGraphVertexs(
+            List<string> lineElements, int subjectCount)
         {
             int lineElementsCount = lineElements.Count;
-            List<GraphVertexEntity> graphVertexs = new List<GraphVertexEntity>(lineElementsCount);
+            List<GraphVertexEntity> graphVertexs =
+                new List<GraphVertexEntity>(lineElementsCount);
             for (int i = 0; i < lineElementsCount; i++)
             {
                 if (i > subjectCount)
@@ -528,8 +588,8 @@ namespace Controller.controller
                         );
                 }
             }
-            foreach (GraphVertexEntity g in graphVertexs)
-                log.Debug("graphVertexs: " + g.ToString());
+            //foreach (GraphVertexEntity g in graphVertexs)
+            //log.Debug("graphVertexs: " + g.ToString());
             return graphVertexs;
         }
 
@@ -556,7 +616,8 @@ namespace Controller.controller
                     }
                     else
                     {
-                        demicalRighValue += unchecked((int)Int64.Parse(hexRightValue, System.Globalization.NumberStyles.HexNumber));
+                        demicalRighValue += unchecked((int)Int64.Parse(
+                            hexRightValue, System.Globalization.NumberStyles.HexNumber));
                     }
                     //        }
                     //    }

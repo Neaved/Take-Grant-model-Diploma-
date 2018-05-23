@@ -9,10 +9,12 @@ namespace Entity.entity
     public class WithSidEntity : BaseEntity
     {
         private string sid;
+        private string lastSidPart;
 
         public WithSidEntity(string name, string sid) : base(name)
         {
             this.sid = sid;
+            fillLastSidPart();
         }
 
         public string Sid
@@ -26,6 +28,24 @@ namespace Entity.entity
             {
                 sid = value;
             }
+        }
+
+        public string LastSidPart
+        {
+            get
+            {
+                return lastSidPart;
+            }
+
+            set
+            {
+                lastSidPart = value;
+            }
+        }
+
+        private void fillLastSidPart()
+        {
+            this.LastSidPart = getLastValueFromSid(Sid);
         }
 
         public static string getLastValueFromSid(string sid)

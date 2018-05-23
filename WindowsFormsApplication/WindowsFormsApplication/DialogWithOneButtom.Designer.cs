@@ -34,7 +34,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(125, 145);
+            this.button1.Location = new System.Drawing.Point(120, 142);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(100, 30);
             this.button1.TabIndex = 0;
@@ -44,12 +44,11 @@
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Times New Roman", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.label1.Location = new System.Drawing.Point(18, 61);
+            this.label1.Location = new System.Drawing.Point(20, 35);
             this.label1.MinimumSize = new System.Drawing.Size(300, 30);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(300, 30);
+            this.label1.Size = new System.Drawing.Size(300, 90);
             this.label1.TabIndex = 1;
             this.label1.Text = "message";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -58,7 +57,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(334, 211);
+            this.ClientSize = new System.Drawing.Size(344, 211);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.button1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -66,10 +65,9 @@
             this.MinimizeBox = false;
             this.Name = "DialogWithOneButtom";
             this.ShowIcon = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Warning";
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 

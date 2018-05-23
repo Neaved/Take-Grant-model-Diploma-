@@ -9,6 +9,7 @@ namespace Controller.controller
 {
     class WriteToTextFile
     {
+        private const string path = "C:\\Take Grant Programm Adjacency Matrix\\";
 
         public void writeToTxt(List<List<String>> fileSystemRights)
         {
@@ -44,38 +45,41 @@ namespace Controller.controller
 
         public void writeAdjacencyMatrix(int[][] adjacencyMatrix, List<string> lineElements)
         {
-            using (StreamWriter writer = new StreamWriter("D:\\ProgrammLog\\adjacencyMatrix(" + getDateTimePostfix() + ").txt"))
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            using (StreamWriter writer = new StreamWriter(path + "\\adjacencyMatrix(" + getDateTimePostfix() + ").txt"))
             {
                 for (int i = 0; i < adjacencyMatrix.Length; i++)
+                {
+                    for (int j = 0; j < adjacencyMatrix.Length; j++)
                     {
-                        for (int j = 0; j < adjacencyMatrix.Length; j++)
-                        {
-                            writer.Write($"| {adjacencyMatrix[i][j]} ");
-                        }
-                        writer.WriteLine($"| \t{lineElements[i]} ");
-                        // writer.WriteLine($"\n--------------------------------------------\n");
+                        writer.Write($"| {adjacencyMatrix[i][j]} ");
                     }
+                    writer.WriteLine($"| \t{lineElements[i]} ");
+                }
+            }
         }
-    }
 
         public void writeLog(List<string> log)
         {
             using (StreamWriter writer = new StreamWriter("D:\\ProgrammLog\\log(" + getDateTimePostfix() + ").txt"))
             {
-                foreach(string logLine in log)
+                foreach (string logLine in log)
                 {
                     writer.WriteLine($"{logLine} ");
-                   // writer.Write($"\n\n");
+                    // writer.Write($"\n\n");
                 }
             }
         }
 
 
-    private string getDateTimePostfix()
-    {
-        DateTime time = DateTime.Now;
-        return time.ToString("yyyy, MM, dd, hh, mm, ss");
-    }
+        private string getDateTimePostfix()
+        {
+            DateTime time = DateTime.Now;
+            return time.ToString("yyyy, MM, dd, hh, mm, ss");
+        }
 
-}
+    }
 }
