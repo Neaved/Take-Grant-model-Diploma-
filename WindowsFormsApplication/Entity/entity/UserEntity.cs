@@ -9,7 +9,7 @@ using log4net.Config;
 
 namespace Entity.entity
 {
-    public class UserAccount : WithSidEntity
+    public class UserEntity : WithSidEntity
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -17,7 +17,8 @@ namespace Entity.entity
         private HashSet<string> groupNames;
         private string description;
 
-        public UserAccount(string name, string sid, HashSet<string> groupNames, string description) : base(name, sid)
+        public UserEntity()  { }
+        public UserEntity(string name, string sid, HashSet<string> groupNames, string description) : base(name, sid)
         {
             XmlConfigurator.Configure();
             setFullName(name);
@@ -25,7 +26,7 @@ namespace Entity.entity
             this.description = description;
         }
 
-        public UserAccount(string name, string sid, HashSet<string> groupNames) : base(name, sid)
+        public UserEntity(string name, string sid, HashSet<string> groupNames) : base(name, sid)
         {
             this.groupNames = groupNames;
         }
@@ -99,11 +100,5 @@ namespace Entity.entity
                 FullName = Name;
             }
         }
-
-        public override string ToString()
-        {
-            return Name + "; " + Sid + ";";
-        }
-
     }
 }

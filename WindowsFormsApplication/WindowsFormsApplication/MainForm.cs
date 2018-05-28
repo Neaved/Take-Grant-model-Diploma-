@@ -1,52 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.IO;
-using System.Threading.Tasks;
+using System.Reflection;
 using System.Windows.Forms;
-using static Controller.controller.ControllerUtils;
-using Entity.entity;
-using Controller.controller;
-using System.Management;
-using static System.Windows.Forms.ListView;
 using ConjTable.Demo;
+using Controller.controller;
+using Entity.entity;
 using log4net;
 using log4net.Config;
-using System.Reflection;
+using static System.Windows.Forms.ListView;
+using static Controller.controller.ControllerUtils;
 
 namespace WindowsFormsApplication
 {
     public partial class MainForm : Form
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log =
+            LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public MainForm()
         {
             XmlConfigurator.Configure();
             InitializeComponent();
-            textBox1.Text = "D:\\testFolder";
+            //Set default value for textBox1
+            setDefaultValueFortextBox1();
+        }
+
+        private void setDefaultValueFortextBox1()
+        {
+            //textBox1.Text = "D:\\testFolder";
         }
 
         private void showUserAccounts(object sender, EventArgs e)
         {
-            UserAccountController controller = UserAccountController.Instance;
-            string userAccountControllerException = controller.UserAccountControllerException;
-            if (showException(userAccountControllerException))
+            UserEntityController controller = UserEntityController.Instance;
+            string userEntityControllerException =
+                controller.UserEntityControllerException;
+            if (showException(userEntityControllerException))
             {
-                DialogWithOneButtom error = new DialogWithOneButtom(userAccountControllerException);
+                DialogWithOneButtom error =
+                    new DialogWithOneButtom(userEntityControllerException);
                 error.Show();
             }
             else
             {
-                refreshListView(controller.UserAccounts);
+                refreshListView(controller.UserEntities);
             }
         }
 
-        private void refreshListView(List<UserAccount> entities)
+        private void refreshListView(List<UserEntity> entities)
         {
             if (isNotEmpty(entities))
             {
@@ -55,9 +56,9 @@ namespace WindowsFormsApplication
             }
         }
 
-        private void addUserAccountsToListView(List<UserAccount> userAccounts)
+        private void addUserAccountsToListView(List<UserEntity> userAccounts)
         {
-            foreach (UserAccount userAccount in userAccounts)
+            foreach (UserEntity userAccount in userAccounts)
             {
                 ListViewItem lvi = new ListViewItem(userAccount.FullName);
                 lvi.SubItems.Add(userAccount.Sid);
@@ -81,20 +82,22 @@ namespace WindowsFormsApplication
                 listView1.Items.Clear();
                 if (showException(fileControllerException))
                 {
-                    DialogWithOneButtom error = new DialogWithOneButtom(fileControllerException);
+                    DialogWithOneButtom error =
+                        new DialogWithOneButtom(fileControllerException);
                     error.Show();
                 }
                 else
                 {
-                    foreach (FileInfo file in controller.Files)
+                    foreach (FileEntity fileEntity in controller.FileEntities)
                     {
-                        listView1.Items.Add(new ListViewItem(file.FullName));
+                        listView1.Items.Add(new ListViewItem(fileEntity.FullFileName));
                     }
                 }
             }
             else
             {
-                DialogWithOneButtom error = new DialogWithOneButtom("fill directory path");
+                DialogWithOneButtom error =
+                    new DialogWithOneButtom("fill directory path");
                 error.Show();
             }
         }
@@ -109,10 +112,8 @@ namespace WindowsFormsApplication
         {
             SelectedListViewItemCollection fileItems = listView1.SelectedItems;
             SelectedListViewItemCollection userItems = listView2.SelectedItems;
-
             int fileItemsCount = fileItems.Count;
             int userItemsCount = userItems.Count;
-
             if (fileItemsCount > 0 && userItemsCount > 0)
             {
                 GraphForm graphForm = new GraphForm(fileItems, userItems);
@@ -122,17 +123,20 @@ namespace WindowsFormsApplication
             {
                 if (fileItemsCount == 0 && userItemsCount == 0)
                 {
-                    DialogWithOneButtom error = new DialogWithOneButtom("select file(s) and user(s)");
+                    DialogWithOneButtom error =
+                        new DialogWithOneButtom("select file(s) and user(s)");
                     error.ShowDialog();
                 }
                 else if (userItemsCount == 0)
                 {
-                    DialogWithOneButtom error = new DialogWithOneButtom("select user(s)");
+                    DialogWithOneButtom error =
+                        new DialogWithOneButtom("select user(s)");
                     error.ShowDialog();
                 }
                 else
                 {
-                    DialogWithOneButtom error = new DialogWithOneButtom("select file(s)");
+                    DialogWithOneButtom error =
+                        new DialogWithOneButtom("select file(s)");
                     error.ShowDialog();
                 }
             }

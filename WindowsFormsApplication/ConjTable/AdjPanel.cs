@@ -15,8 +15,8 @@ namespace System.Windows.Forms
         private PointF _mouseDown;
         private IDragable _dragged;
         private List<GraphVertexEntity> graphVertexs;
-        private List<MatrixElement> ownerElements;
-        private List<MatrixElement> administratorElements;
+        private List<AccessMatrixElement> ownerElements;
+        private List<AccessMatrixElement> administratorElements;
 
         private PointF Center
         {
@@ -32,7 +32,7 @@ namespace System.Windows.Forms
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint | ControlStyles.ResizeRedraw | ControlStyles.Selectable, true);
         }
 
-        public void Build(int[][] conjMatrix, List<GraphVertexEntity> graphVertexs, List<MatrixElement> ownerElements, List<MatrixElement> administratorElements)
+        public void Build(int[][] conjMatrix, List<GraphVertexEntity> graphVertexs, List<AccessMatrixElement> ownerElements, List<AccessMatrixElement> administratorElements)
         {
             this.graphVertexs = graphVertexs;
             this.ownerElements = ownerElements;
@@ -69,7 +69,7 @@ namespace System.Windows.Forms
                     if (conjMatrix[i][j] != 0)
                     {
                         _nodes[i].Linked.Add(_nodes[j]);
-                        MatrixElement matrixElement = new MatrixElement(i, j);
+                        AccessMatrixElement matrixElement = new AccessMatrixElement(i, j);
                         if (isAdministratorElements(matrixElement))
                         {
                             _nodes[i].IsAdministrator = true;
@@ -85,11 +85,11 @@ namespace System.Windows.Forms
             ArrangeNodes();
         }
 
-        private bool isOwnerElements(MatrixElement matrixElement)
+        private bool isOwnerElements(AccessMatrixElement matrixElement)
         {
             if (isNotEmpty(ownerElements))
             {
-                foreach (MatrixElement ownerElement in ownerElements)
+                foreach (AccessMatrixElement ownerElement in ownerElements)
                 {
                     if (matrixElement.compareElementPosition(ownerElement))
                     {
@@ -100,11 +100,11 @@ namespace System.Windows.Forms
             return false;
         }
 
-        private bool isAdministratorElements(MatrixElement matrixElement)
+        private bool isAdministratorElements(AccessMatrixElement matrixElement)
         {
             if (isNotEmpty(administratorElements))
             {
-                foreach (MatrixElement administratorElement in administratorElements)
+                foreach (AccessMatrixElement administratorElement in administratorElements)
                 {
                     if (matrixElement.compareElementPosition(administratorElement))
                     {

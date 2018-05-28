@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="Controller.controller.AccessMatrixController">
+    <Position X="3.25" Y="0.5" Width="8" />
+    <Members>
+      <Property Name="AccessMatrix" Hidden="true" />
+      <Field Name="ADMINISTRATOR_PERMISSION_FLAG" Hidden="true" />
+      <Field Name="ADMINISTRATOR_SID_VALUES" Hidden="true" />
+      <Field Name="existedUserSids" Hidden="true" />
+      <Field Name="File_Security_Setting_Path" Hidden="true" />
+      <Property Name="GraphVertexs" Hidden="true" />
+      <Field Name="log" Hidden="true" />
+      <Field Name="REPLACE_MACROS" Hidden="true" />
+      <Property Name="WarningMessages" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>CCAACAQQQAihgIEABAIgKAEAGgAIoBAAiQAAAAAAZig=</HashCode>
+      <FileName>controller\AccessMatrixController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

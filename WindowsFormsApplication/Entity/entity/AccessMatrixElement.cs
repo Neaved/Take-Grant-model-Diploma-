@@ -6,23 +6,15 @@ using System.Threading.Tasks;
 
 namespace Entity.entity
 {
-    public class MatrixElement
+    public class AccessMatrixElement
     {
         private int row;
         private int column;
 
-        public MatrixElement(int row, int column)
+        public AccessMatrixElement(int row, int column)
         {
             this.row = row;
             this.column = column;
-        }
-
-        public bool compareElementPosition(MatrixElement element)
-        {
-            bool a = this.row.Equals(element.Row);
-            bool b = this.column.Equals(element.Column);
-
-            return this.row.Equals(element.Row) && this.column.Equals(element.Column);
         }
 
         public int Row
@@ -51,7 +43,10 @@ namespace Entity.entity
             }
         }
 
-
+        public bool compareElementPosition(AccessMatrixElement element)
+        {
+            return Row.Equals(element.Row) && Column.Equals(element.Column);
+        }
 
     }
 }

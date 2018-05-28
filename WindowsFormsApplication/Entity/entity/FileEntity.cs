@@ -8,20 +8,25 @@ namespace Entity.entity
 {
     public class FileEntity : BaseEntity
     {
-        private string pathToFile;
-        private bool isDirectory;
+        private string fullFileName;
 
-        public FileEntity(string name, string pathToFile, bool isDirectory) : base(name)
+        public FileEntity(string name, string fullFileName) : base(name)
         {
-            this.pathToFile = pathToFile;
-            this.isDirectory = isDirectory;
+            this.fullFileName = fullFileName;
         }
 
-        //public FileEntity(string pathToFile)
-        //{
-        //    this.pathToFile = pathToFile;
-        //    this.fileName = getFileNameFromPath();
-        //}
+        public string FullFileName
+        {
+            get
+            {
+                return fullFileName;
+            }
+
+            set
+            {
+                fullFileName = value;
+            }
+        }
 
         public static string getFileNameFromPath(string pathToFile)
         {

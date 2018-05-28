@@ -54,7 +54,7 @@
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(119, 21);
             this.button1.TabIndex = 0;
-            this.button1.Text = "Show users Account";
+            this.button1.Text = "Show Users";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.showUserAccounts);
             // 
@@ -92,7 +92,7 @@
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(125, 21);
             this.button3.TabIndex = 4;
-            this.button3.Text = "Show File in Directory";
+            this.button3.Text = "Show Files in Directory";
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.ShowFilesInDirectory);
             // 
@@ -167,8 +167,8 @@
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.Controls.Add(this.listView1, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.listView2, 1, 1);
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel4, 1, 0);
+            this.tableLayoutPanel1.Controls.Add(this.listView2, 1, 1);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(12, 12);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 2;
@@ -217,8 +217,9 @@
             this.Controls.Add(this.tableLayoutPanel1);
             this.MinimumSize = new System.Drawing.Size(1320, 670);
             this.Name = "MainForm";
+            this.ShowIcon = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Form1";
+            this.Text = "Take-Grant Model Builder";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);

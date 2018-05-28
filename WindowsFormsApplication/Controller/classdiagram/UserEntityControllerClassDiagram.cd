@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="FullSignature">
+  <Class Name="Controller.controller.UserEntityController">
+    <Position X="2.5" Y="1.75" Width="4.5" />
+    <Members>
+      <Property Name="Instance" Hidden="true" />
+      <Field Name="log" Hidden="true" />
+      <Property Name="UserEntities" Hidden="true" />
+      <Property Name="UserEntityControllerException" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAABEAIAABAAACAAAAAhAAAAAwAAAAAAAAAA=</HashCode>
+      <FileName>controller\UserEntityController.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

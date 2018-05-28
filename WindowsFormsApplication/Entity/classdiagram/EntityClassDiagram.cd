@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="Entity.entity.BaseEntity">
+    <Position X="5.75" Y="0.5" Width="2.25" />
+    <Members>
+      <Property Name="Name" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAQAAAAEAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>entity\BaseEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Entity.entity.FileEntity">
+    <Position X="1.25" Y="3" Width="2.5" />
+    <Members>
+      <Property Name="FullFileName" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAEAAAABAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAA=</HashCode>
+      <FileName>entity\FileEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Entity.entity.GraphVertexEntity">
+    <Position X="4.75" Y="3" Width="1.75" />
+    <Members>
+      <Property Name="IsObject" Hidden="true" />
+    </Members>
+    <Compartments>
+      <Compartment Name="Properties" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>entity\GraphVertexEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Entity.entity.Group">
+    <Position X="8.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>entity\Group.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Entity.entity.ManagementEntity">
+    <Position X="10.5" Y="6.5" Width="1.75" />
+    <Members>
+      <Property Name="AccessMask" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>entity\ManagementEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Entity.entity.AccessMatrixElement">
+    <Position X="9.75" Y="0.5" Width="2.5" />
+    <Members>
+      <Property Name="Column" Hidden="true" />
+      <Property Name="Row" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAABAAAACQAAAAgAAAAAAAABAAAA=</HashCode>
+      <FileName>entity\AccessMatrixElement.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Entity.entity.Permission">
+    <Position X="12.5" Y="0.5" Width="3.5" />
+    <Members>
+      <Field Name="EXECUTE_PERMISSION" Hidden="true" />
+      <Field Name="GENERIC_ALL_PERMISSION" Hidden="true" />
+      <Field Name="READ_PERMISSION" Hidden="true" />
+      <Field Name="VALID_PERMISSIONS" Hidden="true" />
+      <Field Name="WHITE_PERMISSION" Hidden="true" />
+    </Members>
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="Entity.entity.Permission.Mask">
+        <TypeIdentifier>
+          <NewMemberFileName>entity\Permission.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>gAEAAAAAAAABAAAAAAAAAAAAAAAAAAAAEAAgAAAAAAA=</HashCode>
+      <FileName>entity\Permission.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Entity.entity.UserEntity">
+    <Position X="5" Y="6.5" Width="2.5" />
+    <Members>
+      <Property Name="Description" Hidden="true" />
+      <Property Name="FullName" Hidden="true" />
+      <Property Name="GroupNames" Hidden="true" />
+      <Field Name="log" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AACAAIAAgAAgAIAAIACACAAAAAAAAAAAAAAAABAAAAA=</HashCode>
+      <FileName>entity\UserEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Entity.entity.WithSidEntity">
+    <Position X="7.75" Y="3" Width="2.5" />
+    <Members>
+      <Property Name="LastSidPart" Hidden="true" />
+      <Property Name="Sid" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQEAAAEAAAAAAAEAAABAAQAAAAEAAA=</HashCode>
+      <FileName>entity\WithSidEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

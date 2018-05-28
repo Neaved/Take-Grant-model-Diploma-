@@ -44,19 +44,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="entity\FileEntity.cs" />
     <Compile Include="entity\GraphVertexEntity.cs" />
     <Compile Include="entity\Group.cs" />
     <Compile Include="entity\BaseEntity.cs" />
     <Compile Include="entity\ManagementEntity.cs" />
-    <Compile Include="entity\MatrixElement.cs" />
+    <Compile Include="entity\AccessMatrixElement.cs" />
     <Compile Include="entity\Permission.cs" />
-    <Compile Include="entity\UserAccount.cs" />
+    <Compile Include="entity\UserEntity.cs" />
     <Compile Include="entity\WithSidEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram\EntityClassDiagram.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

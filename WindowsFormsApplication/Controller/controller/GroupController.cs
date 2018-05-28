@@ -8,14 +8,10 @@ using Entity.entity;
 using Controller.controller;
 using System.Management;
 
-
-
-
 namespace Controller.controller
 {
     public class GroupController
     {
-        private static GroupController instance = new GroupController();
         private List<Group> groups = new List<Group>();
         private string groupsException;
 
@@ -24,14 +20,6 @@ namespace Controller.controller
             getWin32Group();
         }
  
-        public static GroupController Instance
-        {
-            get
-            {
-                return instance;
-            }
-        }
-
         public List<Group> Groups
         {
             get
@@ -50,9 +38,9 @@ namespace Controller.controller
 
         private void getWin32Group()
         {
-            SelectQuery selectQuery = new SelectQuery("Win32_Group");
             try
             {
+                SelectQuery selectQuery = new SelectQuery("Win32_Group");
                 ManagementObjectSearcher selectedObjects = new ManagementObjectSearcher(selectQuery);
                 foreach (ManagementObject obj in selectedObjects.Get())
                 {
@@ -60,13 +48,12 @@ namespace Controller.controller
                         new Group(
                             obj["Name"].ToString(),
                             obj["SID"].ToString()
-                            //, obj["Description"].ToString()
                             ));
                 }
             }
             catch (Exception ex)
             {
-                groupsException = ex.ToString();
+                groupsException = ex.Message;
             }
         }
     }

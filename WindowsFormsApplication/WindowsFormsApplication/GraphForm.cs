@@ -1,32 +1,35 @@
-﻿using Controller.controller;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Windows.Forms;
+using Controller.controller;
 using Entity.entity;
-using static System.Windows.Forms.ListView;
-using static Controller.controller.ControllerUtils;
 using log4net;
 using log4net.Config;
-using System.Reflection;
 using WindowsFormsApplication;
+using static System.Windows.Forms.ListView;
+using static Controller.controller.ControllerUtils;
 
 namespace ConjTable.Demo
 {
     public partial class GraphForm : Form
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log =
+            LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        private int[][] _matrix;
+        private int[][] accessMatrix;
         private List<GraphVertexEntity> graphVertexs;
-        private List<MatrixElement> ownerElements = new List<MatrixElement>();
-        private List<MatrixElement> adminElements = new List<MatrixElement>();
+        private List<AccessMatrixElement> ownerElements = new List<AccessMatrixElement>();
+        private List<AccessMatrixElement> adminElements = new List<AccessMatrixElement>();
 
-        public GraphForm(SelectedListViewItemCollection fileItems, SelectedListViewItemCollection entityItems)
+        public GraphForm(SelectedListViewItemCollection fileItems,
+            SelectedListViewItemCollection entityItems)
         {
             XmlConfigurator.Configure();
             InitializeComponent();
-            AccessMatrixController controller = new AccessMatrixController(fileItems, entityItems);
-            this._matrix = getAccessMatrix(controller.AdjacencyMatrix);
+            AccessMatrixController controller =
+                new AccessMatrixController(fileItems, entityItems);
+            this.accessMatrix = getAccessMatrix(controller.AccessMatrix);
             this.graphVertexs = controller.GraphVertexs;
             addWarningMessages(controller.WarningMessages);
         }
@@ -42,36 +45,21 @@ namespace ConjTable.Demo
                     if (adjacencyMatrix[i][j] > 9000)
                     {
                         adjacencyMatrix[i][j] -= 9000;
-                        adminElements.Add(new MatrixElement(i, j));
+                        adminElements.Add(new AccessMatrixElement(i, j));
                     }
                     if (adjacencyMatrix[i][j] > 8000)
                     {
                         adjacencyMatrix[i][j] -= 8000;
-                        ownerElements.Add(new MatrixElement(i, j));
+                        ownerElements.Add(new AccessMatrixElement(i, j));
                     }
                 }
             }
             return adjacencyMatrix;
         }
 
-        //int[,] _matrix = new int[,]
-        //                {
-        //        {0, 0, 1},
-        //        {0, 0, 1},
-        //        {0, 0, 0},
-        //    };
-        //{
-        //    {0, 1, 1, 1, 1},
-        //    {1, 0, 1, 1, 1},
-        //    {1, 1, 0, 1, 1},
-        //    {1, 1, 1, 0, 1},
-        //    {1, 1, 1, 0, 1},
-        //};
-
         private void addWarningMessages(List<string> warningMessages)
         {
             listBox1.Items.Clear();
-            log.Debug("warningMessages Count: " + warningMessages.Count);
             if (isNotEmpty(warningMessages))
             {
                 foreach (string warningMessage in warningMessages)
@@ -86,23 +74,37 @@ namespace ConjTable.Demo
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            conjTable1.Build(_matrix);
-            conjPanel1.Build(_matrix, graphVertexs, ownerElements, adminElements);
+            conjTable1.Build(accessMatrix);
+            conjPanel1.Build(
+                accessMatrix, 
+                graphVertexs, 
+                ownerElements, 
+                adminElements);
         }
 
         private void updateButton_Click(object sender, EventArgs e)
         {
-            conjPanel1.Build(conjTable1.Matrix, graphVertexs, ownerElements, adminElements);
+            conjPanel1.Build(
+                conjTable1.Matrix, 
+                graphVertexs, 
+                ownerElements, 
+                adminElements);
         }
 
-        private void conjTable1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        private void conjTable1_CellValueChanged(object sender,
+            DataGridViewCellEventArgs e)
         {
-            conjPanel1.Build(conjTable1.Matrix, graphVertexs, ownerElements, adminElements);
+            conjPanel1.Build(
+                conjTable1.Matrix, 
+                graphVertexs, 
+                ownerElements, 
+                adminElements);
         }
 
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
-            AdditionalGraphInfoForm additionalGraphInfoForm = new AdditionalGraphInfoForm();
+            AdditionalGraphInfoForm additionalGraphInfoForm =
+                new AdditionalGraphInfoForm();
             additionalGraphInfoForm.ShowDialog();
         }
     }

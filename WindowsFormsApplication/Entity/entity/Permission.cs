@@ -49,17 +49,5 @@ namespace Entity.entity
             {GENERIC_ALL_PERMISSION, "10000000"},
             {"WRITE_OWNER", "00080000"}
         };
-
-        //    [Flags]
-        public enum MaskForGraph : uint
-        {
-            FILE_READ_DATA = 0x00000001,
-            FILE_WRITE_DATA = 0x00000002,
-            FILE_EXECUTE = 0x00000020,
-            GENERIC_ALL = 0x10000000,
-            GENERIC_EXECUTE = 0x20000000,
-            GENERIC_WRITE = 0x40000000,
-            GENERIC_READ = 0x80000000
-        }
     }
 }

@@ -47,13 +47,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="controller\AccessMatrixController.cs" />
     <Compile Include="controller\ControllerUtils.cs" />
     <Compile Include="controller\FileController.cs" />
     <Compile Include="controller\GroupController.cs" />
-    <Compile Include="controller\UserAccountController.cs" />
-    <Compile Include="controller\WriteToTextFile.cs" />
+    <Compile Include="controller\UserEntityController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -63,7 +61,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagrams\AccessMatrixControllerClassDiagram.cd" />
+    <None Include="ClassDiagrams\FileControllerClassDiagram.cd" />
     <None Include="packages.config" />
+    <None Include="ClassDiagrams\UserEntityControllerClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

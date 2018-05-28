@@ -13,21 +13,21 @@ using log4net.Config;
 
 namespace Controller.controller
 {
-    public class UserAccountController
+    public class UserEntityController
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        private static UserAccountController instance = new UserAccountController();
-        private List<UserAccount> userAccounts = new List<UserAccount>();
-        private string userAccountControllerException;
+        private static UserEntityController instance = new UserEntityController();
+        private List<UserEntity> userEntities = new List<UserEntity>();
+        private string userEntityControllerException;
 
-        private UserAccountController()
+        private UserEntityController()
         {
             XmlConfigurator.Configure();
             getWin32UserAccount();
         }
 
-        public static UserAccountController Instance
+        public static UserEntityController Instance
         {
             get
             {
@@ -35,13 +35,26 @@ namespace Controller.controller
             }
         }
 
-        public string UserAccountControllerException
+        public List<UserEntity> UserEntities
         {
             get
             {
-                if (isEmpty(userAccountControllerException))
+                return userEntities;
+            }
+
+            set
+            {
+                userEntities = value;
+            }
+        }
+
+        public string UserEntityControllerException
+        {
+            get
+            {
+                if (isEmpty(userEntityControllerException))
                 {
-                    return userAccountControllerException;
+                    return userEntityControllerException;
                 }
                 else
                 {
@@ -50,24 +63,16 @@ namespace Controller.controller
             }
         }
 
-        public List<UserAccount> UserAccounts
-        {
-            get
-            {
-                return userAccounts;
-            }
-        }
-
         private void getWin32UserAccount()
         {
-            SelectQuery selectQuery = new SelectQuery("Win32_UserAccount");
             try
             {
+                SelectQuery selectQuery = new SelectQuery("Win32_UserAccount");
                 ManagementObjectSearcher selectedObjects = new ManagementObjectSearcher(selectQuery);
                 foreach (ManagementObject obj in selectedObjects.Get())
                 {
-                    userAccounts.Add(
-                        new UserAccount(
+                    userEntities.Add(
+                        new UserEntity(
                             getFullName(obj),
                             obj["SID"].ToString(),
                             getGroupsForUser(obj["Domain"].ToString(), obj["Name"].ToString()),
@@ -76,7 +81,9 @@ namespace Controller.controller
             }
             catch (Exception ex)
             {
-                userAccountControllerException = ex.ToString();
+                userEntityControllerException = ex.Message;
+                log.Error("Exception Message: " + ex.Message);
+                log.Error("Exception StackTrace: " + ex.StackTrace);
             }
         }
 
@@ -85,7 +92,7 @@ namespace Controller.controller
             Object fullName = obj["FullName"];
             if (isNotEmpty(fullName))
             {
-                    return obj["Name"].ToString() + "|" + fullName.ToString();
+                return obj["Name"].ToString() + "|" + fullName.ToString();
             }
             else
             {

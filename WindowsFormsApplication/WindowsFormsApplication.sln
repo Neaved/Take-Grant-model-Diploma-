@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsFormsApplication", "WindowsFormsApplication\WindowsFormsApplication.csproj", "{784A3BE7-EAF1-4861-9CAC-A29A33654DBE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplicationForms", "WindowsFormsApplication\ApplicationForms.csproj", "{784A3BE7-EAF1-4861-9CAC-A29A33654DBE}"
 	ProjectSection(ProjectDependencies) = postProject
 		{90A3AA72-6761-4A44-A4CF-CF3F4B43F701} = {90A3AA72-6761-4A44-A4CF-CF3F4B43F701}
 	EndProjectSection
@@ -12,9 +12,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entity", "Entity\Entity.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Controller", "Controller\Controller.csproj", "{EFC7C22D-341F-4893-83AF-79A133C9EB97}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Form", "Form\Form.csproj", "{CD98FA20-25BB-4A42-92E9-7EF9BC700A72}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConjTable", "ConjTable\ConjTable.csproj", "{90A3AA72-6761-4A44-A4CF-CF3F4B43F701}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GraphConfig", "ConjTable\GraphConfig.csproj", "{90A3AA72-6761-4A44-A4CF-CF3F4B43F701}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{53F93AA8-4D7A-46F7-8E32-04704540F40D}"
 	ProjectSection(SolutionItems) = preProject
@@ -39,10 +37,6 @@ Global
 		{EFC7C22D-341F-4893-83AF-79A133C9EB97}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EFC7C22D-341F-4893-83AF-79A133C9EB97}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EFC7C22D-341F-4893-83AF-79A133C9EB97}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CD98FA20-25BB-4A42-92E9-7EF9BC700A72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CD98FA20-25BB-4A42-92E9-7EF9BC700A72}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CD98FA20-25BB-4A42-92E9-7EF9BC700A72}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CD98FA20-25BB-4A42-92E9-7EF9BC700A72}.Release|Any CPU.Build.0 = Release|Any CPU
 		{90A3AA72-6761-4A44-A4CF-CF3F4B43F701}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{90A3AA72-6761-4A44-A4CF-CF3F4B43F701}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{90A3AA72-6761-4A44-A4CF-CF3F4B43F701}.Release|Any CPU.ActiveCfg = Release|Any CPU

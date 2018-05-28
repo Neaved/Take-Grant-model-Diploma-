@@ -16,7 +16,7 @@ namespace Entity.entity
             this.accessMask = accessMask;
         }
 
-        public uint AccessMask
+        public UInt32 AccessMask
         {
             get
             {

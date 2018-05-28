@@ -11,6 +11,8 @@ using System.Management;
 using log4net;
 using log4net.Config;
 using System.Reflection;
+using System.Timers;
+using System.Diagnostics;
 
 namespace Controller.controller
 {
@@ -18,21 +20,13 @@ namespace Controller.controller
     {
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        private List<FileInfo> files = new List<FileInfo>();
+        private List<FileEntity> fileEntities = new List<FileEntity>();
         private string fileControllerException;
 
         public FileController(string directoryName)
         {
             XmlConfigurator.Configure();
-            getFileFromDirectory(directoryName);
-        }
-
-        public List<FileInfo> Files
-        {
-            get
-            {
-                return files;
-            }
+            getFilesFromDirectory(directoryName);
         }
 
         public string FileControllerException
@@ -50,30 +44,57 @@ namespace Controller.controller
             }
         }
 
-        public void getFileFromDirectory(string directoryName)
+        public List<FileEntity> FileEntities
+        {
+            get
+            {
+                return fileEntities;
+            }
+
+            set
+            {
+                fileEntities = value;
+            }
+        }
+
+        private void getFilesFromDirectory(string directoryName)
+        {
+            DirectoryInfo directory = new DirectoryInfo(directoryName);
+            //Stopwatch stopwatch = new Stopwatch();
+            //log.Debug("time start ");
+            //stopwatch.Start();
+            findFileInDirectory(directory);
+            //stopwatch.Stop();
+            //log.Debug("time stop ");
+            //log.Debug("time TotalMilliseconds " + stopwatch.Elapsed.TotalMilliseconds);
+        }
+
+        private void findFileInDirectory(DirectoryInfo directory)
         {
             try
             {
-                DirectoryInfo directory = new DirectoryInfo(directoryName);
-                findFileInDirectory(directory);
+                foreach (FileInfo file in directory.GetFiles())
+                {
+                    fileEntities.Add(
+                        new FileEntity(
+                            file.Name,
+                            file.FullName
+                            ));
+                }
+                foreach (DirectoryInfo subDir in directory.GetDirectories())
+                {
+                    findFileInDirectory(subDir);
+                }
+            }
+            catch (UnauthorizedAccessException uaEx)
+            {
+                log.Error("Exception Message: " + uaEx.Message);
             }
             catch (Exception ex)
             {
                 fileControllerException = ex.Message;
                 log.Error("Exception Message: " + ex.Message);
                 log.Error("Exception StackTrace: " + ex.StackTrace);
-            }
-        }
-
-        private void findFileInDirectory(DirectoryInfo directory)
-        {
-            foreach (FileInfo file in directory.GetFiles())
-            {
-                files.Add(file);
-            }
-            foreach (DirectoryInfo subDir in directory.GetDirectories())
-            {
-                findFileInDirectory(subDir);
             }
         }
 

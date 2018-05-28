@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="System.Windows.Forms.Helper">
+    <Position X="0.5" Y="0.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAICAgAQAAEAwAAAABkAQAABAAAAAAAQAAgAQ=</HashCode>
+      <FileName>Helper.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="System.Windows.Forms.Node" BaseTypeListCollapsed="true">
+    <Position X="4.25" Y="0.75" Width="2" />
+    <Members>
+      <Property Name="IsAdministrator" Hidden="true" />
+      <Property Name="IsObject" Hidden="true" />
+      <Property Name="IsOwner" Hidden="true" />
+      <Property Name="Linked" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AAAIgAAIEIIACAAEASICAAAAAgAAAAIAAAAAAAAIQAA=</HashCode>
+      <FileName>Node.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="System.Windows.Forms.AdjPanel">
+    <Position X="6.75" Y="0.75" Width="3.5" />
+    <Members>
+      <Property Name="Center" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AACASBAAAAIAAEAIIAAAIAAAgBBAgAABIAAAAAAaIAA=</HashCode>
+      <FileName>AdjPanel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="System.Windows.Forms.AdjTable">
+    <Position X="10.75" Y="0.75" Width="2.25" />
+    <Members>
+      <Property Name="Matrix" Hidden="true" />
+    </Members>
+    <TypeIdentifier>
+      <HashCode>AQBAAAAAAAAAAAAAAAAAAAAAAAAggAAAAAAAAQAAAAA=</HashCode>
+      <FileName>AdjTable.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="System.Windows.Forms.IDrawable">
+    <Position X="14.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAA=</HashCode>
+      <FileName>Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Interface Name="System.Windows.Forms.IDragable">
+    <Position X="12.25" Y="5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIAAAAAAQIAAAAAAAAAAAAAAAAAAAAAQAA=</HashCode>
+      <FileName>Interfaces.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

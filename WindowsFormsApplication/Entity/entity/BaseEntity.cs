@@ -10,6 +10,7 @@ namespace Entity.entity
     {
         private string name;
 
+        public BaseEntity() { }
         public BaseEntity(string name)
         {
             this.name = name;
