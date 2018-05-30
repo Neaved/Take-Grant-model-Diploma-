@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Entity.entity
 {
@@ -32,22 +28,5 @@ namespace Entity.entity
             GENERIC_WRITE = 0x40000000,
             GENERIC_READ = 0x80000000
         }
-
-        //double a = 0x80000000;
-
-        public const string READ_PERMISSION = "FILE_READ_DATA";
-        public const string WHITE_PERMISSION = "FILE_WRITE_DATA";
-        public const string EXECUTE_PERMISSION = "FILE_EXECUTE";
-        public const string GENERIC_ALL_PERMISSION = "GENERIC_ALL";
-
-
-        public static Dictionary<string, string> VALID_PERMISSIONS = new Dictionary<string, string>()
-        {
-            {READ_PERMISSION, "00000001"},
-            {WHITE_PERMISSION, "00000002"},
-            {EXECUTE_PERMISSION, "00000020"},
-            {GENERIC_ALL_PERMISSION, "10000000"},
-            {"WRITE_OWNER", "00080000"}
-        };
     }
 }

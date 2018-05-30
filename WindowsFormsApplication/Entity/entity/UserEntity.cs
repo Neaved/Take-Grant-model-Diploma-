@@ -1,24 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using log4net;
+﻿using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
+using log4net;
 using log4net.Config;
+
 
 namespace Entity.entity
 {
     public class UserEntity : WithSidEntity
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log =
+            LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private string fullName;
         private HashSet<string> groupNames;
         private string description;
 
-        public UserEntity()  { }
-        public UserEntity(string name, string sid, HashSet<string> groupNames, string description) : base(name, sid)
+        public UserEntity() { }
+        public UserEntity(string name, string sid, HashSet<string> groupNames,
+            string description) : base(name, sid)
         {
             XmlConfigurator.Configure();
             setFullName(name);
@@ -26,7 +26,8 @@ namespace Entity.entity
             this.description = description;
         }
 
-        public UserEntity(string name, string sid, HashSet<string> groupNames) : base(name, sid)
+        public UserEntity(string name, string sid,
+            HashSet<string> groupNames) : base(name, sid)
         {
             this.groupNames = groupNames;
         }
@@ -76,7 +77,7 @@ namespace Entity.entity
                 StringBuilder sb = new StringBuilder();
                 foreach (string groupName in GroupNames)
                 {
-                    sb.Append(groupName + ", ");
+                    sb.Append(groupName + Сonstants.CommaAndSpaceSymbols);
                 }
                 string groupNames = sb.ToString();
                 return groupNames.Substring(0, groupNames.Length - 2);
@@ -89,11 +90,13 @@ namespace Entity.entity
 
         private void setFullName(string name)
         {
-            if (name.Contains("|"))
+            if (name.Contains(Сonstants.PipeSymbol))
             {
-                string[] namePart = name.Split('|');
+                string[] namePart = name.Split(Сonstants.PipeSplitSymbolChar);
                 Name = namePart[0].Trim();
-                FullName = name.Replace("|", " (") + ")";
+                FullName = name
+                    .Replace(Сonstants.PipeSymbol, Сonstants.SpaceAndLeftParenthesisSymbols)
+                    + Сonstants.RightParenthesisSymbol;
             }
             else
             {

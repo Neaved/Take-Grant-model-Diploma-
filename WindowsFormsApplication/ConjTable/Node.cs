@@ -47,7 +47,11 @@ namespace System.Windows.Forms
             }
             if (!string.IsNullOrEmpty(Label))
             {
-                gr.DrawCenteredString(Label, SystemFonts.CaptionFont, SystemBrushes.ControlDarkDark, Radius);
+                gr.DrawCenteredString(
+                    Label,
+                    SystemFonts.CaptionFont,
+                    SystemBrushes.ControlDarkDark,
+                    Radius);
             }
             gr.Restore(state);
         }
@@ -80,7 +84,6 @@ namespace System.Windows.Forms
             return string.Format("Node: {0}", Label);
         }
 
-        //public void Paint(Graphics gr, List<MatrixElement> ownerElemens, List<MatrixElement> adminElemens) { }
 
         public bool IsOwner
         {

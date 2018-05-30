@@ -2,13 +2,9 @@
 
 namespace System.Windows.Forms
 {
-    /// <summary>
-    /// Контрол для редактирования матрицы смежности
-    /// </summary>
     public class AdjTable : DataGridView
     {
         private int[][] _matrix;
-        // { get => _matrix; }
         public int[][] Matrix
         {
             get
@@ -16,7 +12,6 @@ namespace System.Windows.Forms
                 return _matrix;
             }
         }
-
 
         public AdjTable()
         {
@@ -32,7 +27,8 @@ namespace System.Windows.Forms
         {
             try
             {
-                _matrix[e.RowIndex][e.ColumnIndex] = int.Parse(e.Value == null ? "0" : e.Value.ToString());
+                _matrix[e.RowIndex][e.ColumnIndex] =
+                    int.Parse(e.Value == null ? "0" : e.Value.ToString());
             }
             catch (Exception)
             {
@@ -58,8 +54,6 @@ namespace System.Windows.Forms
         {
             _matrix = matrix;
             RowCount = ColumnCount = _matrix.Length;
-            //ColumnCount = _matrix.GetLength(1);
-            //RowCount = _matrix.GetLength(0);
             Invalidate();
         }
     }

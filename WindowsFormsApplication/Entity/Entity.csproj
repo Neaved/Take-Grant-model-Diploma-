@@ -54,9 +54,10 @@
     <Compile Include="entity\UserEntity.cs" />
     <Compile Include="entity\WithSidEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Сonstants.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram\EntityClassDiagram.cd" />
+    <None Include="classdiagram\EntityClassDiagram.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

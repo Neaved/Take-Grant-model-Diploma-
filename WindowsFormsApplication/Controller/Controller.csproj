@@ -61,10 +61,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagrams\AccessMatrixControllerClassDiagram.cd" />
-    <None Include="ClassDiagrams\FileControllerClassDiagram.cd" />
+    <None Include="classdiagram\AccessMatrixControllerClassDiagram.cd" />
+    <None Include="classdiagram\FileControllerClassDiagram.cd" />
     <None Include="packages.config" />
-    <None Include="ClassDiagrams\UserEntityControllerClassDiagram.cd" />
+    <None Include="classdiagram\UserEntityControllerClassDiagram.cd" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

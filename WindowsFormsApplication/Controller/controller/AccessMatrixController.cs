@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Management;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using Entity;
 using Entity.entity;
 using log4net;
 using log4net.Config;
@@ -18,20 +18,10 @@ namespace Controller.controller
 {
     public class AccessMatrixController
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-        private const string ADMINISTRATOR_PERMISSION_FLAG = "100000000";
-        
-        private const string REPLACE_MACROS = "replace_macros";
-        private const string File_Security_Setting_Path =
-            "Win32_logicalFileSecuritySetting.Path='" + REPLACE_MACROS + "'";
+        private static readonly ILog log =
+            LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        private HashSet<string> ADMINISTRATOR_SID_VALUES = new HashSet<string>()
-        {
-            "500",
-            "544"
-        };
         private List<string> existedUserSids = new List<string>();
-
         private List<string> selectedFiles;
         private List<UserEntity> selectedUsers;
         private Dictionary<string, Dictionary<string, List<string>>> dictionaryPermissions =
@@ -77,13 +67,14 @@ namespace Controller.controller
                 this.selectedFiles = getSelectedFiles(fileItems);
                 this.selectedUsers = getSelectedUsers(userAccountItems);
                 //Stopwatch stopwatch = new Stopwatch();
-                //log.Debug("time start ");
+                //log.Debug("Stopwatch Start");
                 //stopwatch.Start();
                 prepareDictionaryPermissions();
                 buildAccessMatrix();
                 //stopwatch.Stop();
-                //log.Debug("time stop ");
-                //log.Debug("time TotalMilliseconds " + stopwatch.Elapsed.TotalMilliseconds);
+                //log.Debug("Stopwatch Stop");
+                //log.Debug("Stopwatch TotalMilliseconds " 
+                //	+ stopwatch.Elapsed.TotalMilliseconds);
             }
             catch (Exception ex)
             {
@@ -113,7 +104,8 @@ namespace Controller.controller
                     new UserEntity(
                         item.SubItems[0].Text,
                         item.SubItems[1].Text,
-                        getGroupNames(item.SubItems[2].Text.Split(','))
+                        getGroupNames(
+                            item.SubItems[2].Text.Split(Сonstants.CommaSplitSymbolChar))
                         )
                     );
             }
@@ -135,60 +127,60 @@ namespace Controller.controller
             foreach (string fileFullName in selectedFiles)
             {
                 ManagementObject managementObject =
-                    new ManagementObject(
-                        File_Security_Setting_Path.Replace(REPLACE_MACROS, fileFullName));
-                ManagementBaseObject managementBaseObject =
-                    managementObject.InvokeMethod("GetSecurityDescriptor", null, null);
-                if (((uint)(managementBaseObject.Properties["ReturnValue"].Value)) == 0)
+                    new ManagementObject(Сonstants.FileSecuritySettingPath
+                        .Replace(Сonstants.ReplaceMacros, fileFullName));
+                ManagementBaseObject mbo = managementObject.InvokeMethod(
+                    Сonstants.GetSecurityDescriptorProperty, null, null);
+                if (((uint)(mbo.Properties[Сonstants.ReturnValueProperty].Value)) == 0)
                 {
-                    ManagementBaseObject securityDescriptor =
-                        ((ManagementBaseObject)(managementBaseObject.Properties["Descriptor"].Value));
+                    ManagementBaseObject securityDescriptor = ((ManagementBaseObject)(mbo
+                            .Properties[Сonstants.DescriptorProperty]
+                            .Value));
                     ManagementBaseObject[] daclObject =
-                        ((ManagementBaseObject[])(securityDescriptor.Properties["Dacl"].Value));
-                    Dictionary<string, List<string>> usersPermissions = getUsersPermissions(daclObject, fileFullName);
+                        ((ManagementBaseObject[])(securityDescriptor
+                            .Properties[Сonstants.DaclProperty]
+                            .Value));
+                    Dictionary<string, List<string>> usersPermissions =
+                        getUsersPermissions(daclObject, fileFullName);
                     if (isNotEmpty(usersPermissions))
                     {
                         dictionaryPermissions.Add(fileFullName, usersPermissions);
                     }
                 }
-
             }
         }
 
-        private Dictionary<string, List<string>> getUsersPermissions(ManagementBaseObject[] daclObject, string fileName)
+        private Dictionary<string, List<string>> getUsersPermissions(
+            ManagementBaseObject[] daclObject, string fileName)
         {
             existedUserSids.Clear();
             fillUsersListAcсordingToAceTypeValue(daclObject);
             Dictionary<string, List<string>> usersPermissions =
                 new Dictionary<string, List<string>>();
-
-            log.Debug("----------------------------------------------fileName: " + fileName + " ---------------------------------------------------------------------------");
-
+            //log.Debug("fileName: " + fileName);
             foreach (UserEntity selectedUser in selectedUsers)
             {
-                log.Debug("----------------------------------------------st for selectedUser: " + selectedUser.ToString() + " ---------------------------------------------------------------------------");
-
+                //log.Debug("selectedUser: " + selectedUser.ToString());
                 string selectedUserSidValue = selectedUser.Sid;
                 UInt32 accessMask = getAccessMask(
                     selectedUserSidValue,
                     selectedUser.GroupNames,
                     getAllowedAceUserSidValues().Contains(selectedUserSidValue));
-                log.Debug("final AccessMask: " + accessMask);
+                //log.Debug("final AccessMask: " + accessMask);
                 bool isUserHaveNeedRightForGraph = false;
                 if (accessMask != 0)
                 {
                     List<string> permissionsOnFile = getPermissionsOnFile(
                         Enum
                         .Format(typeof(Mask), accessMask, "g")
-                        .Replace(" ", string.Empty)
-                        .Split(','));
+                        .Replace(Сonstants.SpaceSymbol, string.Empty)
+                        .Split(Сonstants.CommaSplitSymbolChar));
 
                     if (isNotEmpty(permissionsOnFile))
                     {
                         if (isAdministratorSidValue(selectedUser.LastSidPart))
                         {
-                            permissionsOnFile.Add(ADMINISTRATOR_PERMISSION_FLAG);
-                            //permissionsOnFile.Add("administratorFlag");
+                            permissionsOnFile.Add(Сonstants.AdministratorPermissionFlag);
                         }
                         usersPermissions.Add(selectedUserSidValue, permissionsOnFile);
                         isUserHaveNeedRightForGraph = true;
@@ -196,16 +188,15 @@ namespace Controller.controller
 
                     if (!isUserHaveNeedRightForGraph)
                     {
-                        log.Debug("user with sid '" + selectedUser.LastSidPart + "' don't have need right on file '" + fileName + "' for graph");
-                        warningMessages.Add(
-                            "user with sid '" + selectedUser.LastSidPart +
-                            "' don't have need right on file '" + fileName + "' for graph");
+                        log.Debug(Сonstants.AbsentRightError
+                            .Replace(Сonstants.ReplaceMacros, selectedUser.LastSidPart)
+                            .Replace(Сonstants.ReplaceFileNameMacros, fileName));
+                        warningMessages.Add(Сonstants.AbsentRightError
+                            .Replace(Сonstants.ReplaceMacros, selectedUser.LastSidPart)
+                            .Replace(Сonstants.ReplaceFileNameMacros, fileName));
                     }
 
                 }
-
-                log.Debug("----------------------------------------------end for selectedUser---------------------------------------------------------------------------");
-
             }
             fillWarningMessages(fileName);
             return usersPermissions;
@@ -214,47 +205,40 @@ namespace Controller.controller
         private void fillUsersListAcсordingToAceTypeValue(
             ManagementBaseObject[] daclObject)
         {
-            log.Debug("-------------------fillUsersListAcсordingToAceTypeValue st------------------------------");
-
             usersListWithAllowedAceType.Clear();
             usersListWithDeniedAceType.Clear();
             foreach (ManagementBaseObject mbo in daclObject)
             {
-                //log.Debug("-------------------DaclObject Properties------------------------------");
-                //foreach (PropertyData prop in mbo.Properties)
-                //{
-                //    log.Debug("propName: '" + prop.Name + "' - propValue: '" + prop.Value + "'");
-                //}
-                //log.Debug("---------------------------------------------------------------------");
-                //log.Debug("");
-
-                ManagementBaseObject Trustee = ((ManagementBaseObject)(mbo["Trustee"]));
+                //log.Debug("DaclObject Properties");
+                //logPropertyData(mbo);
+                ManagementBaseObject trustee =
+                    ((ManagementBaseObject)(mbo[Сonstants.TrusteeProperty]));
                 ManagementEntity managementEntity = new ManagementEntity(
-                    (string)Trustee.Properties["Name"].Value,
-                    (string)Trustee.Properties["SIDString"].Value,
-                    (UInt32)mbo["AccessMask"]);
-
-                //log.Debug("-------------------Trustee Properties------------------------------");
-                //foreach (PropertyData prop in Trustee.Properties)
-                //{
-                //    log.Debug("propName: '" + prop.Name + "' - propValue: '" + prop.Value + "'");
-                //}
-                //log.Debug("---------------------------------------------------------------------");
-                //log.Debug("");
-
-                if (mbo["AceType"].ToString() == "0")
+                    (string)trustee.Properties[Сonstants.NameProperty].Value,
+                    (string)trustee.Properties[Сonstants.SIDStringProperty].Value,
+                    (UInt32)mbo[Сonstants.AccessMaskProperty]);
+                //log.Debug("Trustee Properties");
+                //logPropertyData(trustee);
+                if (mbo[Сonstants.AceTypeProperty].ToString() == "0")
                 {
-                    log.Debug("ALLOWED ACE TYPE");
+                    //log.Debug("ALLOWED ACE TYPE");
                     usersListWithAllowedAceType.Add(managementEntity);
                 }
                 else
                 {
-                    log.Debug("DENIED ACE TYPE");
+                    //log.Debug("DENIED ACE TYPE");
                     usersListWithDeniedAceType.Add(managementEntity);
                 }
 
             }
-            log.Debug("-------------------fillUsersListAcсordingToAceTypeValue end------------------------------");
+        }
+
+        private void logPropertyData(ManagementBaseObject mbo)
+        {
+            //foreach (PropertyData prop in mbo.Properties)
+            //{
+            //  log.Debug("propName: '" + prop.Name + "' - propValue: '" + prop.Value + "'");
+            //}
         }
 
         private List<string> getAllowedAceUserSidValues()
@@ -268,7 +252,8 @@ namespace Controller.controller
             return allowedAceUserSidValues;
         }
 
-        private UInt32 getAccessMask(string selectedUserSidValue, HashSet<string> selectedUserGroupNames, bool isSelectedUserDefinedInDacl)
+        private UInt32 getAccessMask(string selectedUserSidValue,
+            HashSet<string> selectedUserGroupNames, bool isSelectedUserDefinedInDacl)
         {
             if (isSelectedUserDefinedInDacl)
             {
@@ -299,7 +284,7 @@ namespace Controller.controller
                         allowedAceGroup.AccessMask,
                         getDeniedAccessMaskBySidValue(allowedAceGroup.Sid));
                 }
-                log.Debug("groupsInDacl is Empty");
+                log.Error("groupsInDacl is Empty");
                 return 0;
             }
         }
@@ -332,8 +317,8 @@ namespace Controller.controller
         private UInt32 getFinalAccessMask(
             UInt32 allowedAccessMask, UInt32 deniedAccessMask)
         {
-            log.Debug("allowedAccessMask: " + allowedAccessMask);
-            log.Debug("deniedAccessMask: " + deniedAccessMask);
+            //log.Debug("allowedAccessMask: " + allowedAccessMask);
+            //log.Debug("deniedAccessMask: " + deniedAccessMask);
             if (deniedAccessMask == 0)
             {
                 return allowedAccessMask;
@@ -389,7 +374,7 @@ namespace Controller.controller
                     accessMask = groupAccessMask;
                     groupWithMaxAccessMask = group;
                 }
-                log.Debug("getGroupWithMaxAccessMask accessMask: " + accessMask);
+                //log.Debug("getGroupWithMaxAccessMask accessMask: " + accessMask);
             }
             return groupWithMaxAccessMask;
         }
@@ -399,15 +384,8 @@ namespace Controller.controller
             List<ManagementEntity> groupsInDacl = new List<ManagementEntity>();
             foreach (string groupName in groupNames)
             {
-                //log.Debug("groupName: " + groupName);
-                //log.Debug("groupName Length: " + groupName.Length);
                 foreach (ManagementEntity allowedAceUser in usersListWithAllowedAceType)
                 {
-                    //log.Debug("allowedAceUser.Name: " + allowedAceUser.Name);
-                    //log.Debug("allowedAceUser.Name Length: " + allowedAceUser.Name.Length);
-                    //log.Debug("allowedAceUser.Sid: " + allowedAceUser.Sid);
-                    //log.Debug("allowedAceUser.Sid.Length: " + allowedAceUser.Sid.Split('-').Length);
-
                     if ((groupName.Equals(allowedAceUser.Name))
                             && (allowedAceUser.Sid.Split('-').Length < 8))
                     {
@@ -424,12 +402,12 @@ namespace Controller.controller
             foreach (string permission in permissions)
             {
                 log.Debug("permission: " + permission);
-                if (VALID_PERMISSIONS.ContainsKey(permission))
+                if (Сonstants.ValidPermissions.ContainsKey(permission))
                 {
                     string hexRightValue;
-                    VALID_PERMISSIONS.TryGetValue(permission, out hexRightValue);
+                    Сonstants.ValidPermissions.TryGetValue(permission, out hexRightValue);
                     permissionsOnFile.Add(hexRightValue);
-                    log.Debug("permissionsOnFile add: " + permission);
+                    //log.Debug("permissionsOnFile add: " + permission);
                 }
             }
             return permissionsOnFile;
@@ -437,8 +415,7 @@ namespace Controller.controller
 
         private bool isAdministratorSidValue(string lastSidPart)
         {
-            return ADMINISTRATOR_SID_VALUES.Contains(lastSidPart);
-            //return "500".Equals(sidParts[sidParts.Length - 1]);
+            return Сonstants.AdministratorSidVales.Contains(lastSidPart);
         }
 
         private void fillWarningMessages(string fileName)
@@ -448,7 +425,8 @@ namespace Controller.controller
             {
                 foreach (UserEntity selectedUser in selectedUsers)
                 {
-                    sb.Append(selectedUser.LastSidPart).Append(", ");
+                    sb.Append(selectedUser.LastSidPart)
+                        .Append(Сonstants.CommaAndSpaceSymbols);
                 }
 
             }
@@ -458,18 +436,22 @@ namespace Controller.controller
                 {
                     if (!existedUserSids.Contains(selectedUser.Sid))
                     {
-                        sb.Append(selectedUser.LastSidPart).Append(", ");
+                        sb.Append(selectedUser.LastSidPart)
+                            .Append(Сonstants.CommaAndSpaceSymbols);
                     }
                 }
             }
             string userSidsStr = sb.ToString();
             if (isNotEmpty(userSidsStr))
             {
-                log.Debug("there is no such user(s) " + userSidsStr.Substring(0, userSidsStr.Length - 2) + " in security property of " + fileName);
-                warningMessages.Add(
-                    "there is no such user(s) " + userSidsStr.Substring(
-                        0, userSidsStr.Length - 2) +
-                    " in security property of " + fileName);
+                log.Error(Сonstants.NoSuchUserError
+                    .Replace(Сonstants.ReplaceMacros, userSidsStr
+                    .Substring(0, userSidsStr.Length - 2))
+                    .Replace(Сonstants.ReplaceFileNameMacros, fileName));
+                warningMessages.Add(Сonstants.NoSuchUserError
+                    .Replace(Сonstants.ReplaceMacros, userSidsStr
+                    .Substring(0, userSidsStr.Length - 2))
+                    .Replace(Сonstants.ReplaceFileNameMacros, fileName));
             }
         }
 
@@ -490,7 +472,8 @@ namespace Controller.controller
             {
                 Dictionary<string, List<string>> userWithTheirPermissions =
                     new Dictionary<string, List<string>>();
-                dictionaryPermissions.TryGetValue(lineElements[j], out userWithTheirPermissions);
+                dictionaryPermissions
+                    .TryGetValue(lineElements[j], out userWithTheirPermissions);
                 for (int i = 0; i < subjectCount; i++)
                 {
                     List<string> hexRightValue;
@@ -559,8 +542,6 @@ namespace Controller.controller
                         );
                 }
             }
-            //foreach (GraphVertexEntity g in graphVertexs)
-            //log.Debug("graphVertexs: " + g.ToString());
             return graphVertexs;
         }
 
@@ -571,18 +552,12 @@ namespace Controller.controller
                 int demicalPermissionValue = 0;
                 foreach (string hexRightValue in hexPermissionValues)
                 {
-                    //    for (int i = 0; i < 5; i++)
-                    //    {
-                    //        if (binaryRight[i] == 1)
-                    //        {   unchecked((int)myLongValue)
-                    if ("100000000".Equals(hexRightValue))
+                    if (Сonstants.AdministratorPermissionFlag.Equals(hexRightValue))
                     {
-                        log.Debug("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!isAdmin");
                         demicalPermissionValue += 9000;
                     }
-                    else if ("00080000".Equals(hexRightValue))
+                    else if (Сonstants.WriteOwnerPermissionFlag.Equals(hexRightValue))
                     {
-                        log.Debug("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!isOwner");
                         demicalPermissionValue += 8000;
                     }
                     else
@@ -590,18 +565,16 @@ namespace Controller.controller
                         demicalPermissionValue += unchecked((int)Int64.Parse(
                             hexRightValue, System.Globalization.NumberStyles.HexNumber));
                     }
-                    //        }
-                    //    }
                 }
 
                 return demicalPermissionValue;
             }
             else
             {
-                log.Debug("demicalPermissionValues = 0");
+                log.Error("demicalPermissionValues = 0");
                 return 0;
             }
         }
-
     }
+
 }

@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Controller.controller.ControllerUtils;
-using Entity.entity;
-using Controller.controller;
 using System.Management;
+using Entity;
+using Entity.entity;
 
 namespace Controller.controller
 {
@@ -19,7 +15,7 @@ namespace Controller.controller
         {
             getWin32Group();
         }
- 
+
         public List<Group> Groups
         {
             get
@@ -40,14 +36,15 @@ namespace Controller.controller
         {
             try
             {
-                SelectQuery selectQuery = new SelectQuery("Win32_Group");
-                ManagementObjectSearcher selectedObjects = new ManagementObjectSearcher(selectQuery);
+                SelectQuery selectQuery = new SelectQuery(Сonstants.Win32GroupWMI);
+                ManagementObjectSearcher selectedObjects =
+                    new ManagementObjectSearcher(selectQuery);
                 foreach (ManagementObject obj in selectedObjects.Get())
                 {
                     groups.Add(
                         new Group(
-                            obj["Name"].ToString(),
-                            obj["SID"].ToString()
+                            obj[Сonstants.NameProperty].ToString(),
+                            obj[Сonstants.SIDProperty].ToString()
                             ));
                 }
             }

@@ -1,21 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Entity.entity;
-using Controller.controller;
-using static Controller.controller.ControllerUtils;
 using System.Management;
-using log4net;
 using System.Reflection;
+using Entity;
+using Entity.entity;
+using log4net;
 using log4net.Config;
+using static Controller.controller.ControllerUtils;
 
 namespace Controller.controller
 {
     public class UserEntityController
     {
-        private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog log =
+            LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         private static UserEntityController instance = new UserEntityController();
         private List<UserEntity> userEntities = new List<UserEntity>();
@@ -67,16 +65,21 @@ namespace Controller.controller
         {
             try
             {
-                SelectQuery selectQuery = new SelectQuery("Win32_UserAccount");
-                ManagementObjectSearcher selectedObjects = new ManagementObjectSearcher(selectQuery);
+                SelectQuery selectQuery = new SelectQuery(Сonstants.Win32UserAccountWMI);
+                ManagementObjectSearcher selectedObjects =
+                    new ManagementObjectSearcher(selectQuery);
                 foreach (ManagementObject obj in selectedObjects.Get())
                 {
                     userEntities.Add(
                         new UserEntity(
                             getFullName(obj),
-                            obj["SID"].ToString(),
-                            getGroupsForUser(obj["Domain"].ToString(), obj["Name"].ToString()),
-                            obj["Description"].ToString()));
+                            obj[Сonstants.SIDProperty].ToString(),
+                            getGroupsForUser(Сonstants.ManagementObjectSearcherQuery
+                            .Replace(Сonstants.ReplaceDomain,
+                                obj[Сonstants.DomainProperty].ToString())
+                            .Replace(Сonstants.ReplaceuserName,
+                                obj[Сonstants.NameProperty].ToString())),
+                            obj[Сonstants.DescriptionProperty].ToString()));
                 }
             }
             catch (Exception ex)
@@ -89,30 +92,36 @@ namespace Controller.controller
 
         private string getFullName(ManagementObject obj)
         {
-            Object fullName = obj["FullName"];
+            Object fullName = obj[Сonstants.FullNameProperty];
             if (isNotEmpty(fullName))
             {
-                return obj["Name"].ToString() + "|" + fullName.ToString();
+                return obj[Сonstants.NameProperty].ToString() +
+                    Сonstants.PipeSymbol + fullName.ToString();
             }
             else
             {
-                return obj["Name"].ToString();
+                return obj[Сonstants.NameProperty].ToString();
             }
         }
 
-        private HashSet<string> getGroupsForUser(string domain, string userName)
+        private HashSet<string> getGroupsForUser(string selectQuery)
         {
-            ManagementObjectSearcher searcher = new ManagementObjectSearcher("select * from Win32_GroupUser where PartComponent=\"Win32_UserAccount.Domain='" + domain +"',Name='" + userName + "'\"");
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(selectQuery);
             HashSet<string> groupNames = new HashSet<string>();
             foreach (ManagementObject mObject in searcher.Get())
             {
-                ManagementPath path = new ManagementPath(mObject["GroupComponent"].ToString());
-                if (path.ClassName == "Win32_Group")
+                ManagementPath path =
+                    new ManagementPath(mObject[Сonstants.GroupComponentProperty].ToString());
+                if (path.ClassName == Сonstants.Win32GroupWMI)
                 {
-                    string[] names = path.RelativePath.Split(',');
+                    string[] names = path.RelativePath.Split(Сonstants.CommaSplitSymbolChar);
                     foreach (string name in names)
                     {
-                        groupNames.Add(names[1].Substring(names[1].IndexOf("=") + 1).Replace('"', ' ').Trim());
+                        groupNames.Add(names[1]
+                            .Substring(names[1]
+                            .IndexOf("=") + 1)
+                            .Replace('"', ' ')
+                            .Trim());
                     }
                 }
             }

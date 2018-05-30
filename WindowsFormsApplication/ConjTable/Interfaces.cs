@@ -1,6 +1,4 @@
 ﻿using System.Drawing;
-using Entity.entity;
-using System.Collections.Generic;
 
 namespace System.Windows.Forms
 {
@@ -10,7 +8,6 @@ namespace System.Windows.Forms
     public interface IDrawable
     {
         void Paint(Graphics gr);
-        //void Paint(Graphics gr, List<MatrixElement> ownerElemens, List<MatrixElement> adminElemens);
     }
 
     /// <summary>

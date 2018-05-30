@@ -64,7 +64,7 @@ namespace ConjTable.Demo
             {
                 foreach (string warningMessage in warningMessages)
                 {
-                    log.Debug("warningMessage: " + warningMessage);
+                    //log.Error("warningMessage: " + warningMessage);
                     listBox1.Items.Add(warningMessage);
                 }
             }

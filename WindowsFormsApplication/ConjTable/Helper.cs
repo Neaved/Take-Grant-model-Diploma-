@@ -1,19 +1,21 @@
-﻿using System.Drawing;
+﻿using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Collections.Generic;
-using Entity.entity;
-using static Controller.controller.ControllerUtils;
 
 
 namespace System.Windows.Forms
 {
     internal static class Helper
     {
-        private const int GapAngle = 8;//Зазор в градусах между точками входа смежных рёбер
+        //Зазор в градусах между точками входа смежных рёбер
+        private const int GapAngle = 8;
 
-        private static Pen blackLinkPen = new Pen(Color.Black) { CustomEndCap = new AdjustableArrowCap(5, 10, false) };
-        private static Pen redLinkPen = new Pen(Color.Red) { CustomEndCap = new AdjustableArrowCap(5, 10, false) };
-        private static Pen blueLinkPen = new Pen(Color.Blue) { CustomEndCap = new AdjustableArrowCap(5, 10, false) };
+        private static Pen blackLinkPen =
+            new Pen(Color.Black) { CustomEndCap = new AdjustableArrowCap(5, 10, false) };
+        private static Pen redLinkPen =
+            new Pen(Color.Red) { CustomEndCap = new AdjustableArrowCap(5, 10, false) };
+        private static Pen blueLinkPen =
+            new Pen(Color.Blue) { CustomEndCap = new AdjustableArrowCap(5, 10, false) };
 
         private static Dictionary<string, Pen> penDictionary = new Dictionary<string, Pen>()
         {
@@ -32,9 +34,6 @@ namespace System.Windows.Forms
             return new PointF(pt1.X + pt2.X, pt1.Y + pt2.Y);
         }
 
-        /// <summary>
-        /// Середина отрезка между точками
-        /// </summary>
         public static PointF Mid(this PointF pt1, PointF pt2)
         {
             return new PointF((pt2.X + pt1.X) / 2, (pt2.Y + pt1.Y) / 2);
@@ -47,11 +46,17 @@ namespace System.Windows.Forms
         /// <param name="to">Центр вершины, к которой идёт связь.</param>
         /// <param name="radius">Отступ от вершины.</param>
         /// <param name="straight">Рисовать ребро прямой или кривой Безье?</param>
-        public static void DrawLink(this Graphics g, PointF from, PointF to, float radius/*, bool straight = false*/, string penName)
+        /// <param name="penName">Цвет линии</param>
+        public static void DrawLink(this Graphics g, PointF from, PointF to, float radius
+            /*, bool straight = false*/, string penName)
         {
             //Считаем точки входа ребёр графа в вершины
-            var pt1 = new Vector(to.X - from.X, to.Y - from.Y); pt1.Normalize(); pt1 *= radius;
-            var pt2 = new Vector(from.X - to.X, from.Y - to.Y); pt2.Normalize(); pt2 *= radius;
+            var pt1 = new Vector(to.X - from.X, to.Y - from.Y);
+            pt1.Normalize();
+            pt1 *= radius;
+            var pt2 = new Vector(from.X - to.X, from.Y - to.Y);
+            pt2.Normalize();
+            pt2 *= radius;
             pt1 = pt1.Rotate(GapAngle);
             pt2 = pt2.Rotate(-GapAngle);
             pt1 = pt1.Add(from);
@@ -104,11 +109,16 @@ namespace System.Windows.Forms
         /// <summary>
         /// Рисование строки с выравниванием по центру по вертикали и по горизонтали.
         /// </summary>
-        public static void DrawCenteredString(this Graphics g, string text, Font font, Brush brush, float radius)
+        public static void DrawCenteredString(this Graphics g, string text, Font font,
+            Brush brush, float radius)
         {
             var rect = new RectangleF(-radius, -radius, 2 * radius, 2 * radius);
             rect.Inflate(-3, -3);
-            g.DrawString(text, font, brush, rect, new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
+            g.DrawString(text, font, brush, rect, new StringFormat
+            {
+                Alignment = StringAlignment.Center,
+                LineAlignment = StringAlignment.Center
+            });
         }
         /// <summary>
         /// Преобразование вектора в точку
@@ -124,19 +134,26 @@ namespace System.Windows.Forms
         /// <param name="r1">Радиус первой окружности</param>
         /// <param name="center2">Центр второй окружности</param>
         /// <param name="r2">Радиус второй окружности</param>
-        private static Tuple<PointF, PointF> LineBetweenCircles(PointF center1, float r1, PointF center2, float r2)
+        private static Tuple<PointF, PointF> LineBetweenCircles(PointF center1, float r1,
+            PointF center2, float r2)
         {
             var v = new Vector(center2.X - center1.X, center2.Y - center1.Y);
             v.Normalize();
             var start = Vector.Add(new Vector(center1.X, center1.Y), v * r1);
             var end = Vector.Add(new Vector(center2.X, center2.Y), -v * r2);
-            return new Tuple<PointF, PointF>(new PointF((float)start.X, (float)start.Y), new PointF((float)end.X, (float)end.Y));
+            return new Tuple<PointF, PointF>(
+                new PointF((float)start.X,
+                (float)start.Y),
+                new PointF((float)end.X,
+                (float)end.Y));
         }
 
         private static Vector Rotate(this Vector vector, float angle)
         {
             angle *= (float)Math.PI / 180;
-            return new Vector(vector.X * Math.Cos(angle) - vector.Y * Math.Sin(angle), vector.X * Math.Sin(angle) + vector.Y * Math.Cos(angle));
+            return new Vector(
+                vector.X * Math.Cos(angle) - vector.Y * Math.Sin(angle),
+                vector.X * Math.Sin(angle) + vector.Y * Math.Cos(angle));
         }
 
         private static Vector Add(this Vector vector, PointF point)

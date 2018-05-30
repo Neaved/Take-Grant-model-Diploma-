@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Entity.entity
+﻿namespace Entity.entity
 {
     public class FileEntity : BaseEntity
     {
@@ -30,7 +24,7 @@ namespace Entity.entity
 
         public static string getFileNameFromPath(string pathToFile)
         {
-            string[] pathElements = pathToFile.Split('\\');
+            string[] pathElements = pathToFile.Split(Сonstants.BackSlashSplitSymbolChar);
             return pathElements[pathElements.Length - 1];
         }
 

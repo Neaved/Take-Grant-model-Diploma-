@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
+using Entity;
 using log4net;
 using log4net.Config;
 
@@ -47,7 +48,7 @@ namespace WindowsFormsApplication
                             }
                             else
                             {
-                                sb.Append(" ").Append(words[j]);
+                                sb.Append(Сonstants.SpaceSymbol).Append(words[j]);
                             }
                         }
                     }

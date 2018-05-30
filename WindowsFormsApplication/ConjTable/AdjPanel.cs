@@ -26,19 +26,24 @@ namespace System.Windows.Forms
             }
         }
 
-          //  { get => new PointF(ClientRectangle.Width / 2f, ClientRectangle.Height / 2); }
         public AdjPanel()
         {
-            SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.UserPaint | ControlStyles.ResizeRedraw | ControlStyles.Selectable, true);
+            SetStyle(ControlStyles.AllPaintingInWmPaint
+                | ControlStyles.OptimizedDoubleBuffer
+                | ControlStyles.UserPaint
+                | ControlStyles.ResizeRedraw
+                | ControlStyles.Selectable, true);
         }
 
-        public void Build(int[][] conjMatrix, List<GraphVertexEntity> graphVertexs, List<AccessMatrixElement> ownerElements, List<AccessMatrixElement> administratorElements)
+        public void Build(int[][] conjMatrix, List<GraphVertexEntity> graphVertexs,
+            List<AccessMatrixElement> ownerElements,
+            List<AccessMatrixElement> administratorElements)
         {
             this.graphVertexs = graphVertexs;
             this.ownerElements = ownerElements;
             this.administratorElements = administratorElements;
             //if (conjMatrix.GetLength(0) != conjMatrix.GetLength(1))
-                //throw new ArgumentException("Матрица смежности должна быть квадратной");
+            //throw new ArgumentException("Матрица смежности должна быть квадратной");
 
             if (_nodes == null)
                 CreateNodes(conjMatrix);
@@ -62,7 +67,15 @@ namespace System.Windows.Forms
         private void CreateNodes(int[][] conjMatrix)
         {
             int conjMatrixLenght = conjMatrix.Length;
-            _nodes = Enumerable.Range(0, conjMatrixLenght).Select(i => new Node { Label = graphVertexs[i].Name, IsObject = graphVertexs[i].IsObject }).ToList();
+            _nodes = Enumerable
+                .Range(0, conjMatrixLenght)
+                .Select(
+                    i => new Node
+                    {
+                        Label = graphVertexs[i].Name,
+                        IsObject = graphVertexs[i].IsObject
+                    })
+                .ToList();
             for (int i = 0; i < conjMatrixLenght; i++)
                 for (int j = 0; j < conjMatrixLenght; j++)
                 {
@@ -153,10 +166,9 @@ namespace System.Windows.Forms
             {
                 _mouseDown = e.Location;
                 var p = ToClient(e.Location);
-                //ищем объект под мышкой
                 var hitted = _nodes.FirstOrDefault(n => n.Hit(p));
                 if (hitted != null)
-                    _dragged = hitted.StartDrag(p);//начинаем тащить
+                    _dragged = hitted.StartDrag(p);
             }
         }
 
@@ -164,20 +176,17 @@ namespace System.Windows.Forms
         {
             if (e.Button == MouseButtons.Left)
             {
-                var shift = new PointF(e.Location.X - _mouseDown.X, e.Location.Y - _mouseDown.Y);
+                var shift =
+                    new PointF(e.Location.X - _mouseDown.X, e.Location.Y - _mouseDown.Y);
                 _mouseDown = e.Location;
-                //
                 if (_dragged != null)
-                    _dragged.Drag(shift);//двигаем объект
+                    _dragged.Drag(shift);
                 else
-                    _offset = new PointF(_offset.X + shift.X, _offset.Y + shift.Y);//сдвигаем канвас
-
+                    _offset = new PointF(_offset.X + shift.X, _offset.Y + shift.Y);
                 Invalidate();
             }
             var p = ToClient(e.Location);
-            //ищем объект под мышкой
             var hitted = _nodes.FirstOrDefault(n => n.Hit(p));
-            //Меняем курсор, если над вершиной 
             Cursor = hitted != null ? Cursors.Hand : Cursors.Default;
         }
 

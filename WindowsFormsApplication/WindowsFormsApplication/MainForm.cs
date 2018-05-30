@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using ConjTable.Demo;
 using Controller.controller;
+using Entity;
 using Entity.entity;
 using log4net;
 using log4net.Config;
@@ -97,7 +98,7 @@ namespace WindowsFormsApplication
             else
             {
                 DialogWithOneButtom error =
-                    new DialogWithOneButtom("fill directory path");
+                    new DialogWithOneButtom(Сonstants.FillDirectoryPathError);
                 error.Show();
             }
         }
@@ -124,19 +125,19 @@ namespace WindowsFormsApplication
                 if (fileItemsCount == 0 && userItemsCount == 0)
                 {
                     DialogWithOneButtom error =
-                        new DialogWithOneButtom("select file(s) and user(s)");
+                        new DialogWithOneButtom(Сonstants.SelectUserAndFileError);
                     error.ShowDialog();
                 }
                 else if (userItemsCount == 0)
                 {
                     DialogWithOneButtom error =
-                        new DialogWithOneButtom("select user(s)");
+                        new DialogWithOneButtom(Сonstants.SelectUserError);
                     error.ShowDialog();
                 }
                 else
                 {
                     DialogWithOneButtom error =
-                        new DialogWithOneButtom("select file(s)");
+                        new DialogWithOneButtom(Сonstants.SelectFileError);
                     error.ShowDialog();
                 }
             }
