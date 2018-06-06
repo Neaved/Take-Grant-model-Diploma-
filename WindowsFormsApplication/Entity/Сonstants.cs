@@ -23,9 +23,9 @@ namespace Entity
         public const string ExecutePermission = "FILE_EXECUTE";
         public const string GenericAllPermission = "GENERIC_ALL";
         public const string WriteOwnerPermission = "WRITE_OWNER";
-        public const string AdministratorPermissionFlag = "100000000";
-        public const string WriteOwnerPermissionFlag = "00080000";
 
+        // Used reserved 27 bit
+        public const string EmptyBinPermission = "00000000000000000000000000000000";
 
         public static Dictionary<string, string> ValidPermissions
             = new Dictionary<string, string>()

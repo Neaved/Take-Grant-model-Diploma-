@@ -61,30 +61,6 @@
       <FileName>entity\AccessMatrixElement.cs</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="Entity.entity.Permission">
-    <Position X="12.5" Y="0.5" Width="3.5" />
-    <Members>
-      <Field Name="EXECUTE_PERMISSION" Hidden="true" />
-      <Field Name="GENERIC_ALL_PERMISSION" Hidden="true" />
-      <Field Name="READ_PERMISSION" Hidden="true" />
-      <Field Name="VALID_PERMISSIONS" Hidden="true" />
-      <Field Name="WHITE_PERMISSION" Hidden="true" />
-    </Members>
-    <Compartments>
-      <Compartment Name="Nested Types" Collapsed="false" />
-    </Compartments>
-    <NestedTypes>
-      <Enum Name="Entity.entity.Permission.Mask">
-        <TypeIdentifier>
-          <NewMemberFileName>entity\Permission.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
-    </NestedTypes>
-    <TypeIdentifier>
-      <HashCode>gAEAAAAAAAABAAAAAAAAAAAAAAAAAAAAEAAgAAAAAAA=</HashCode>
-      <FileName>entity\Permission.cs</FileName>
-    </TypeIdentifier>
-  </Class>
   <Class Name="Entity.entity.UserEntity">
     <Position X="5" Y="6.5" Width="2.5" />
     <Members>
@@ -107,6 +83,28 @@
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAQEAAAEAAAAAAAEAAABAAQAAAAEAAA=</HashCode>
       <FileName>entity\WithSidEntity.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Entity.entity.PermissionEntity">
+    <Position X="13" Y="0.5" Width="2.75" />
+    <Members>
+      <Property Name="IsEmpty" Hidden="true" />
+      <Field Name="log" Hidden="true" />
+      <Property Name="Permissions" Hidden="true" />
+    </Members>
+    <Compartments>
+      <Compartment Name="Nested Types" Collapsed="false" />
+    </Compartments>
+    <NestedTypes>
+      <Enum Name="Entity.entity.PermissionEntity.Permission">
+        <TypeIdentifier>
+          <NewMemberFileName>entity\PermissionEntity.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AADAAAAAAAAAAAAAAAAACAAAAAAAAAAAEAFAABAAQAA=</HashCode>
+      <FileName>entity\PermissionEntity.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />

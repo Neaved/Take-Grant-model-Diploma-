@@ -35,7 +35,7 @@ namespace System.Windows.Forms
                 | ControlStyles.Selectable, true);
         }
 
-        public void Build(int[][] conjMatrix, List<GraphVertexEntity> graphVertexs,
+        public void Build(string[][] conjMatrix, List<GraphVertexEntity> graphVertexs,
             List<AccessMatrixElement> ownerElements,
             List<AccessMatrixElement> administratorElements)
         {
@@ -53,18 +53,18 @@ namespace System.Windows.Forms
             Invalidate();
         }
 
-        private void UpdateNodes(int[][] conjMatrix)
+        private void UpdateNodes(string[][] conjMatrix)
         {
             foreach (var item in _nodes)
                 item.Linked.Clear();
             int conjMatrixLenght = conjMatrix.Length;
             for (int i = 0; i < conjMatrixLenght; i++)
                 for (int j = 0; j < conjMatrixLenght; j++)
-                    if (conjMatrix[i][j] != 0)
+                    if (conjMatrix[i][j] != "0")
                         _nodes[i].Linked.Add(_nodes[j]);
         }
 
-        private void CreateNodes(int[][] conjMatrix)
+        private void CreateNodes(string[][] conjMatrix)
         {
             int conjMatrixLenght = conjMatrix.Length;
             _nodes = Enumerable
@@ -79,7 +79,7 @@ namespace System.Windows.Forms
             for (int i = 0; i < conjMatrixLenght; i++)
                 for (int j = 0; j < conjMatrixLenght; j++)
                 {
-                    if (conjMatrix[i][j] != 0)
+                    if (conjMatrix[i][j] != "0")
                     {
                         _nodes[i].Linked.Add(_nodes[j]);
                         AccessMatrixElement matrixElement = new AccessMatrixElement(i, j);

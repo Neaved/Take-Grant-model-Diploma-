@@ -23,12 +23,12 @@ namespace WindowsFormsApplication
             XmlConfigurator.Configure();
             InitializeComponent();
             //Set default value for textBox1
-            setDefaultValueFortextBox1();
+            //setDefaultValueFortextBox1();
         }
 
         private void setDefaultValueFortextBox1()
         {
-            //textBox1.Text = "D:\\testFolder";
+            textBox1.Text = "D:\\testFolder";
         }
 
         private void showUserAccounts(object sender, EventArgs e)
@@ -84,7 +84,8 @@ namespace WindowsFormsApplication
                 if (showException(fileControllerException))
                 {
                     DialogWithOneButtom error =
-                        new DialogWithOneButtom(fileControllerException);
+                        //new DialogWithOneButtom(fileControllerException);
+                        new DialogWithOneButtom("Не правильно указан путь к файлам.");
                     error.Show();
                 }
                 else

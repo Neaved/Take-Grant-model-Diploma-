@@ -17,7 +17,7 @@ namespace ConjTable.Demo
         private static readonly ILog log =
             LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        private int[][] accessMatrix;
+        private string[][] accessMatrix;
         private List<GraphVertexEntity> graphVertexs;
         private List<AccessMatrixElement> ownerElements = new List<AccessMatrixElement>();
         private List<AccessMatrixElement> adminElements = new List<AccessMatrixElement>();
@@ -34,27 +34,51 @@ namespace ConjTable.Demo
             addWarningMessages(controller.WarningMessages);
         }
 
-        private int[][] getAccessMatrix(int[][] adjacencyMatrix)
+        private string[][] getAccessMatrix(string[][] adjacencyMatrix)
         {
             int numberOfElements = adjacencyMatrix.Length;
-
             for (int i = 0; i < numberOfElements; i++)
             {
                 for (int j = 0; j < numberOfElements; j++)
                 {
-                    if (adjacencyMatrix[i][j] > 9000)
+                    string binaryPermission = adjacencyMatrix[i][j];
+
+                    if (isNotEmpty(binaryPermission))
                     {
-                        adjacencyMatrix[i][j] -= 9000;
-                        adminElements.Add(new AccessMatrixElement(i, j));
+                        char[] binaryPermissionChar = binaryPermission.ToCharArray();
+                        if (isAdminElements(binaryPermissionChar))
+                        {
+                            adminElements.Add(new AccessMatrixElement(i, j));
+                        }
+                        if (isOwnerElements(binaryPermissionChar))
+                        {
+                            ownerElements.Add(new AccessMatrixElement(i, j));
+                        }
+                        adjacencyMatrix[i][j] = getInHexFormat(binaryPermission);
                     }
-                    if (adjacencyMatrix[i][j] > 8000)
+                    else
                     {
-                        adjacencyMatrix[i][j] -= 8000;
-                        ownerElements.Add(new AccessMatrixElement(i, j));
+                        adjacencyMatrix[i][j] = "0";
+                        continue;
                     }
                 }
             }
             return adjacencyMatrix;
+        }
+
+        private bool isAdminElements(char[] binaryPermission)
+        {
+            return binaryPermission[32 - 27 - 1] == '1';
+        }
+
+        private bool isOwnerElements(char[] binaryPermission)
+        {
+            return binaryPermission[32 - 19 - 1] == '1';
+        }
+
+        private string getInHexFormat(string binaryPermission)
+        {
+            return Convert.ToInt64(binaryPermission, 2).ToString("X8");
         }
 
         private void addWarningMessages(List<string> warningMessages)

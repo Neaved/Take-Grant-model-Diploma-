@@ -1,18 +1,18 @@
-﻿using System;
+﻿using Entity;
+using Entity.entity;
+using log4net;
+using log4net.Config;
+using System;
 using System.Collections.Generic;
 using System.Management;
 using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
-using Entity;
-using Entity.entity;
-using log4net;
-using log4net.Config;
-using static System.Windows.Forms.ListView;
 using static Controller.controller.ControllerUtils;
 using static Entity.entity.FileEntity;
-using static Entity.entity.Permission;
+using static Entity.entity.PermissionEntity;
 using static Entity.entity.WithSidEntity;
+using static System.Windows.Forms.ListView;
 
 namespace Controller.controller
 {
@@ -24,10 +24,10 @@ namespace Controller.controller
         private List<string> existedUserSids = new List<string>();
         private List<string> selectedFiles;
         private List<UserEntity> selectedUsers;
-        private Dictionary<string, Dictionary<string, List<string>>> dictionaryPermissions =
-            new Dictionary<string, Dictionary<string, List<string>>>();
+        private Dictionary<string, Dictionary<string, PermissionEntity>> dictionaryPermissions =
+            new Dictionary<string, Dictionary<string, PermissionEntity>>();
         private List<GraphVertexEntity> graphVertexs;
-        private int[][] accessMatrix;
+        private string[][] accessMatrix;
         private List<ManagementEntity> usersListWithAllowedAceType =
             new List<ManagementEntity>();
         private List<ManagementEntity> usersListWithDeniedAceType =
@@ -50,11 +50,16 @@ namespace Controller.controller
             }
         }
 
-        public int[][] AccessMatrix
+        public string[][] AccessMatrix
         {
             get
             {
                 return accessMatrix;
+            }
+
+            set
+            {
+                accessMatrix = value;
             }
         }
 
@@ -140,7 +145,7 @@ namespace Controller.controller
                         ((ManagementBaseObject[])(securityDescriptor
                             .Properties[Сonstants.DaclProperty]
                             .Value));
-                    Dictionary<string, List<string>> usersPermissions =
+                    Dictionary<string, PermissionEntity> usersPermissions =
                         getUsersPermissions(daclObject, fileFullName);
                     if (isNotEmpty(usersPermissions))
                     {
@@ -150,13 +155,13 @@ namespace Controller.controller
             }
         }
 
-        private Dictionary<string, List<string>> getUsersPermissions(
+        private Dictionary<string, PermissionEntity> getUsersPermissions(
             ManagementBaseObject[] daclObject, string fileName)
         {
             existedUserSids.Clear();
             fillUsersListAcсordingToAceTypeValue(daclObject);
-            Dictionary<string, List<string>> usersPermissions =
-                new Dictionary<string, List<string>>();
+            Dictionary<string, PermissionEntity> usersPermissions =
+                new Dictionary<string, PermissionEntity>();
             //log.Debug("fileName: " + fileName);
             foreach (UserEntity selectedUser in selectedUsers)
             {
@@ -170,17 +175,18 @@ namespace Controller.controller
                 bool isUserHaveNeedRightForGraph = false;
                 if (accessMask != 0)
                 {
-                    List<string> permissionsOnFile = getPermissionsOnFile(
+                    PermissionEntity permissionsOnFile = getPermissionsOnFile(
                         Enum
-                        .Format(typeof(Mask), accessMask, "g")
+                        .Format(typeof(Permission), accessMask, "g")
                         .Replace(Сonstants.SpaceSymbol, string.Empty)
                         .Split(Сonstants.CommaSplitSymbolChar));
 
-                    if (isNotEmpty(permissionsOnFile))
+                    if (!permissionsOnFile.IsEmpty)
                     {
                         if (isAdministratorSidValue(selectedUser.LastSidPart))
                         {
-                            permissionsOnFile.Add(Сonstants.AdministratorPermissionFlag);
+                            permissionsOnFile.addPermission(
+                                Permission.ADMINISTRATOR_FLAG.ToString());
                         }
                         usersPermissions.Add(selectedUserSidValue, permissionsOnFile);
                         isUserHaveNeedRightForGraph = true;
@@ -235,10 +241,10 @@ namespace Controller.controller
 
         private void logPropertyData(ManagementBaseObject mbo)
         {
-            //foreach (PropertyData prop in mbo.Properties)
-            //{
-            //  log.Debug("propName: '" + prop.Name + "' - propValue: '" + prop.Value + "'");
-            //}
+            foreach (PropertyData prop in mbo.Properties)
+            {
+                log.Debug("propName: '" + prop.Name + "' - propValue: '" + prop.Value + "'");
+            }
         }
 
         private List<string> getAllowedAceUserSidValues()
@@ -310,7 +316,6 @@ namespace Controller.controller
                     return deniedAceUser.AccessMask;
                 }
             }
-
             return 0;
         }
 
@@ -396,7 +401,7 @@ namespace Controller.controller
             return groupsInDacl;
         }
 
-        private List<string> getPermissionsOnFile(string[] permissions)
+        private PermissionEntity getPermissionsOnFile(string[] permissions)
         {
             List<string> permissionsOnFile = new List<string>();
             foreach (string permission in permissions)
@@ -404,13 +409,10 @@ namespace Controller.controller
                 log.Debug("permission: " + permission);
                 if (Сonstants.ValidPermissions.ContainsKey(permission))
                 {
-                    string hexRightValue;
-                    Сonstants.ValidPermissions.TryGetValue(permission, out hexRightValue);
-                    permissionsOnFile.Add(hexRightValue);
-                    //log.Debug("permissionsOnFile add: " + permission);
+                    permissionsOnFile.Add(permission);
                 }
             }
-            return permissionsOnFile;
+            return new PermissionEntity(permissionsOnFile);
         }
 
         private bool isAdministratorSidValue(string lastSidPart)
@@ -459,34 +461,41 @@ namespace Controller.controller
         {
             int subjectCount = selectedUsers.Count;
             int objectCount = dictionaryPermissions.Count;
-
             List<string> lineElements = getSortedlineElements(subjectCount, objectCount);
-
-            int[][] accessMatrixTemplate = new int[subjectCount + objectCount][];
-            for (int i = 0; i < accessMatrixTemplate.Length; i++)
-            {
-                accessMatrixTemplate[i] = new int[subjectCount + objectCount];
-            }
+            string[][] accessMatrixTemplate = 
+                getAccessMatrixTemplate(subjectCount + objectCount);
 
             for (int j = subjectCount; j < accessMatrixTemplate.Length; j++)
             {
-                Dictionary<string, List<string>> userWithTheirPermissions =
-                    new Dictionary<string, List<string>>();
+                Dictionary<string, PermissionEntity> userWithTheirPermissions =
+                    new Dictionary<string, PermissionEntity>();
                 dictionaryPermissions
                     .TryGetValue(lineElements[j], out userWithTheirPermissions);
                 for (int i = 0; i < subjectCount; i++)
                 {
-                    List<string> hexRightValue;
-                    userWithTheirPermissions.TryGetValue(lineElements[i], out hexRightValue);
-                    accessMatrixTemplate[i][j] = getDemicalPermissionValue(hexRightValue);
-
+                    PermissionEntity permissions;
+                    userWithTheirPermissions.TryGetValue(lineElements[i], out permissions);
+                    if (permissions != null)
+                    {
+                        accessMatrixTemplate[i][j] = permissions.getPermissionInHexValue();
+                    }
                 }
             }
-            log.Debug(accessMatrixTemplate.Length);
             this.accessMatrix = accessMatrixTemplate;
             this.graphVertexs = getGraphVertexs(lineElements, subjectCount - 1);
-
+            
             writeAccessMatrix(accessMatrix, lineElements);
+            //exportToExel(accessMatrix, lineElements);
+        }
+
+        private string[][] getAccessMatrixTemplate(int length)
+        {
+            string[][] accessMatrixTemplate = new string[length][];
+            for (int i = 0; i < length; i++)
+            {
+                accessMatrixTemplate[i] = new string[length];
+            }
+            return accessMatrixTemplate;
         }
 
         private List<string> getSortedlineElements(int subjectCount, int objectCount)
@@ -501,7 +510,7 @@ namespace Controller.controller
             sortedSelectedUserSid.Sort();
 
             List<string> sortedSelectedFileName = new List<string>(objectCount);
-            foreach (KeyValuePair<string, Dictionary<string, List<string>>> item
+            foreach (KeyValuePair<string, Dictionary<string, PermissionEntity>> item
                 in dictionaryPermissions)
             {
 
@@ -544,37 +553,5 @@ namespace Controller.controller
             }
             return graphVertexs;
         }
-
-        private int getDemicalPermissionValue(List<string> hexPermissionValues)
-        {
-            if (isNotEmpty(hexPermissionValues))
-            {
-                int demicalPermissionValue = 0;
-                foreach (string hexRightValue in hexPermissionValues)
-                {
-                    if (Сonstants.AdministratorPermissionFlag.Equals(hexRightValue))
-                    {
-                        demicalPermissionValue += 9000;
-                    }
-                    else if (Сonstants.WriteOwnerPermissionFlag.Equals(hexRightValue))
-                    {
-                        demicalPermissionValue += 8000;
-                    }
-                    else
-                    {
-                        demicalPermissionValue += unchecked((int)Int64.Parse(
-                            hexRightValue, System.Globalization.NumberStyles.HexNumber));
-                    }
-                }
-
-                return demicalPermissionValue;
-            }
-            else
-            {
-                log.Error("demicalPermissionValues = 0");
-                return 0;
-            }
-        }
     }
-
 }

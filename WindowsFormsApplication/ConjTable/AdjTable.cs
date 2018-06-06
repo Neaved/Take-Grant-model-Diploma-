@@ -4,8 +4,9 @@ namespace System.Windows.Forms
 {
     public class AdjTable : DataGridView
     {
-        private int[][] _matrix;
-        public int[][] Matrix
+        private string[][] _matrix;
+
+        public string[][] Matrix
         {
             get
             {
@@ -28,7 +29,7 @@ namespace System.Windows.Forms
             try
             {
                 _matrix[e.RowIndex][e.ColumnIndex] =
-                    int.Parse(e.Value == null ? "0" : e.Value.ToString());
+                    e.Value == null ? "0" : e.Value.ToString();
             }
             catch (Exception)
             {
@@ -50,7 +51,7 @@ namespace System.Windows.Forms
             base.OnCellValueNeeded(e);
         }
 
-        public void Build(int[][] matrix)
+        public void Build(string[][] matrix)
         {
             _matrix = matrix;
             RowCount = ColumnCount = _matrix.Length;
